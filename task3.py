@@ -13,20 +13,32 @@ class Node:
 class Network:
 
 	def __init__(self, nodes=None):
-
-        if nodes is None:
-            self.nodes = []
-        else:
-            self.nodes = nodes
+		if nodes is None:
+			self.nodes = []
+		else:
+			self.nodes = nodes
 
 	def get_mean_degree(self):
-		#Your code  for task 3 goes here
+		'''
+		This function calculates the mean degree value for all the nodes in a network
+		A nodes degree value is equal to how many edges it has
+		'''
+		total_degree = 0
+		for node in self.nodes:
+			# iterates through each node
+			total_degree += sum(node.connections)
+			# this will sum the amount of connections that node has and adds it to a total
+		return total_degree / len(self.nodes) # calculates and then returns the mean
 
-	def get_mean_clustering(self):
+	#def get_mean_path_length(self):
+
+
+
+
+	#def get_mean_clustering(self):
 		#Your code for task 3 goes here
 
-	def get_mean_path_length(self):
-		#Your code for task 3 goes here
+
 
 	def make_random_network(self, N, connection_probability):
 		'''
@@ -55,6 +67,7 @@ class Network:
 	def plot(self):
 
 		fig = plt.figure()
+		fig.set_facecolor('blue')##################TO_REMOVE########used so that it's easier to see nodes
 		ax = fig.add_subplot(111)
 		ax.set_axis_off()
 
@@ -78,6 +91,7 @@ class Network:
 					neighbour_y = network_radius * np.sin(neighbour_angle)
 
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
+
 
 def test_networks():
 
@@ -129,6 +143,20 @@ def test_networks():
 
 def main():
 	#You should write some code for handling flags here
+	network = Network()
+	network.make_random_network(10, 0.2)
+	network.plot()
+	print(network.get_mean_degree())
+	plt.show()
+
+
+
+
+
+
+
+
 
 if __name__=="__main__":
 	main()
+
