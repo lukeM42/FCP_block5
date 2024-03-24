@@ -5,7 +5,6 @@ import matplotlib.cm as cm
 class Node:
 
 	def __init__(self, value, number, connections=None, parent = None):
-
 		self.index = number
 		self.connections = connections
 		self.value = value
@@ -234,14 +233,10 @@ def test_networks():
 		nodes.append(new_node)
 	network = Network(nodes)
 
-	network.plot()
-	plt.show()
-
 	print("Testing ring network")
 	assert(network.get_mean_degree()==2), network.get_mean_degree()
-	assert (network.get_path_length() == 2.777777777777778), network.get_path_length()
 	assert(network.get_clustering()==0), network.get_clustering()
-
+	assert(network.get_path_length()==2.777777777777778), network.get_path_length()
 
 	nodes = []
 	num_nodes = 10
@@ -251,9 +246,6 @@ def test_networks():
 		new_node = Node(0, node_number, connections=connections)
 		nodes.append(new_node)
 	network = Network(nodes)
-
-	network.plot()
-	plt.show()
 
 	print("Testing one-sided network")
 	assert(network.get_mean_degree()==1), network.get_mean_degree()
@@ -269,29 +261,16 @@ def test_networks():
 		nodes.append(new_node)
 	network = Network(nodes)
 
-	network.plot()
-	plt.show()
-
 	print("Testing fully connected network")
 	assert(network.get_mean_degree()==num_nodes-1), network.get_mean_degree()
-	#assert(network.get_clustering()==1),  network.get_clustering()
+	assert(network.get_clustering()==1),  network.get_clustering()
 	assert(network.get_path_length()==1), network.get_path_length()
 
 	print("All tests passed")
 
-def main():
-	#You should write some code for handling flags here
-	#network = Network()
-	#network.make_random_network(5, 0.3)
-	#network.make_ring_network(20)
-	#network.make_small_world_network(10,0.5)
-	#network.plot()
-	test_networks()
-	#print("mean degree", network.get_mean_degree())
-	#print("mean path length", network.get_mean_path_length())
-	#print("mean clustering coeff", network.get_mean_clustering())
-	#plt.show()
 
+def main():
+	test_networks()
 
 
 
