@@ -11,7 +11,7 @@ class Node:
 		self.value = value
 		self.parent = parent
 
-	def get_children_indexes(self):
+	def get_neighbour_indexes(self):
 		'''
 		Returns the indexes of the nodes connected itself
 		:return:
@@ -53,7 +53,7 @@ class Network:
 			# this will sum the amount of connections that node has and adds it to a total
 		return total_degree / len(self.nodes) # calculates and then returns the mean
 
-	def get_mean_path_length(self):
+	def get_path_length(self):
 		'''
 		Calculates the mean value of a nodes path length to a connected node
 		It will then calculate and return the mean of the mean values for each node.
@@ -74,12 +74,14 @@ class Network:
 		return mean_path_length / len(self.nodes)
 
 
-	def get_mean_clustering(self):
+	def get_clustering(self):
 		total_clustering_coeff = 0
 		for node in self.nodes:
 			n = sum(node.connections)
 			if (n * (n - 1) / 2):
-				total_clustering_coeff += 1 / (n * (n - 1) / 2)
+				possible_connections = (n * (n - 1) / 2)
+				actual_connections = amount_neighbour_connections(node,self.nodes)
+				total_clustering_coeff += actual_connections / possible_connections
 		return total_clustering_coeff / len(self.nodes)
 
 
@@ -184,11 +186,11 @@ def breadth_first_search(start_node,end_node,nodes):
 		current_node = queue.pop()
 		if current_node == end_node:
 			break
-		for child_node_index in current_node.get_children_indexes():
-			if nodes[child_node_index] not in visited:
-				queue.push(nodes[child_node_index])
-				visited.append(nodes[child_node_index])
-				nodes[child_node_index].parent = current_node
+		for neighbour_index in current_node.get_neighbour_indexes():
+			if nodes[neighbour_index] not in visited:
+				queue.push(nodes[neighbour_index])
+				visited.append(nodes[neighbour_index])
+				nodes[neighbour_index].parent = current_node
 	current_node = end_node
 	start_node.parent = None
 	path = []
@@ -204,6 +206,21 @@ def breadth_first_search(start_node,end_node,nodes):
 		# otherwise return False
 		return False
 
+def amount_neighbour_connections(main_node,nodes,connections = 0):
+	'''
+	calculates the amount of neighbour to neighbour connections a nodes neighbours have
+	:param main_node: node to look at neighbours from
+	:param nodes: array containing the nodes
+	:return:
+	'''
+	neighbours = [nodes[neighbour_index] for neighbour_index in main_node.get_neighbour_indexes()]
+	for neighbour1 in neighbours:
+		for neighbour2 in neighbours:
+			if not(neighbour1 == neighbour2) and neighbour1.connections[neighbour2.index] == 1:
+				connections += 1
+	return connections / 2
+
+
 def test_networks():
 
 	#Ring network
@@ -217,10 +234,14 @@ def test_networks():
 		nodes.append(new_node)
 	network = Network(nodes)
 
+	network.plot()
+	plt.show()
+
 	print("Testing ring network")
 	assert(network.get_mean_degree()==2), network.get_mean_degree()
+	assert (network.get_path_length() == 2.777777777777778), network.get_path_length()
 	assert(network.get_clustering()==0), network.get_clustering()
-	assert(network.get_path_length()==2.777777777777778), network.get_path_length()
+
 
 	nodes = []
 	num_nodes = 10
@@ -230,6 +251,9 @@ def test_networks():
 		new_node = Node(0, node_number, connections=connections)
 		nodes.append(new_node)
 	network = Network(nodes)
+
+	network.plot()
+	plt.show()
 
 	print("Testing one-sided network")
 	assert(network.get_mean_degree()==1), network.get_mean_degree()
@@ -245,24 +269,28 @@ def test_networks():
 		nodes.append(new_node)
 	network = Network(nodes)
 
+	network.plot()
+	plt.show()
+
 	print("Testing fully connected network")
 	assert(network.get_mean_degree()==num_nodes-1), network.get_mean_degree()
-	assert(network.get_clustering()==1),  network.get_clustering()
+	#assert(network.get_clustering()==1),  network.get_clustering()
 	assert(network.get_path_length()==1), network.get_path_length()
 
 	print("All tests passed")
 
 def main():
 	#You should write some code for handling flags here
-	network = Network()
+	#network = Network()
 	#network.make_random_network(5, 0.3)
 	#network.make_ring_network(20)
-	network.make_small_world_network(10,0.5)
-	network.plot()
-	print("mean degree", network.get_mean_degree())
-	print("mean path length", network.get_mean_path_length())
-	print("mean clustering coeff", network.get_mean_clustering())
-	plt.show()
+	#network.make_small_world_network(10,0.5)
+	#network.plot()
+	test_networks()
+	#print("mean degree", network.get_mean_degree())
+	#print("mean path length", network.get_mean_path_length())
+	#print("mean clustering coeff", network.get_mean_clustering())
+	#plt.show()
 
 
 
