@@ -14,10 +14,10 @@ class Network:
 
 	def __init__(self, nodes=None):
 
-        if nodes is None:
-            self.nodes = []
-        else:
-            self.nodes = nodes 
+		if nodes is None:
+			self.nodes = []
+		else:
+			self.nodes = nodes
 
 	def get_mean_degree(self):
 		#Your code  for task 3 goes here
@@ -171,58 +171,58 @@ def plot_ising(im, population):
 	This function will display a plot of the Ising model
 	'''
 
-    new_im = np.array([[255 if val == -1 else 1 for val in rows] for rows in population], dtype=np.int8)
-    im.set_data(new_im)
-    plt.pause(0.1)
+	new_im = np.array([[255 if val == -1 else 1 for val in rows] for rows in population], dtype=np.int8)
+	im.set_data(new_im)
+	plt.pause(0.1)
 
 def test_ising():
 	'''
 	This function will test the calculate_agreement function in the Ising model
 	'''
 
-    print("Testing ising model calculations")
-    population = -np.ones((3, 3))
-    assert(calculate_agreement(population,1,1)==4), "Test 1"
+	print("Testing ising model calculations")
+	population = -np.ones((3, 3))
+	assert(calculate_agreement(population,1,1)==4), "Test 1"
 
-    population[1, 1] = 1.
-    assert(calculate_agreement(population,1,1)==-4), "Test 2"
+	population[1, 1] = 1.
+	assert(calculate_agreement(population,1,1)==-4), "Test 2"
 
-    population[0, 1] = 1.
-    assert(calculate_agreement(population,1,1)==-2), "Test 3"
+	population[0, 1] = 1.
+	assert(calculate_agreement(population,1,1)==-2), "Test 3"
 
-    population[1, 0] = 1.
-    assert(calculate_agreement(population,1,1)==0), "Test 4"
+	population[1, 0] = 1.
+	assert(calculate_agreement(population,1,1)==0), "Test 4"
 
-    population[2, 1] = 1.
-    assert(calculate_agreement(population,1,1)==2), "Test 5"
+	population[2, 1] = 1.
+	assert(calculate_agreement(population,1,1)==2), "Test 5"
 
-    population[1, 2] = 1.
-    assert(calculate_agreement(population,1,1)==4), "Test 6"
+	population[1, 2] = 1.
+	assert(calculate_agreement(population,1,1)==4), "Test 6"
 
-    "Testing external pull"
-    population = -np.ones((3, 3))
-    assert(calculate_agreement(population,1,1,1)==3), "Test 7"
-    assert(calculate_agreement(population,1,1,-1)==5), "Test 8"
-    assert(calculate_agreement(population,1,1,10)==14), "Test 9"
-    assert(calculate_agreement(population,1,1,-10)==-6), "Test 10"
+	"Testing external pull"
+	population = -np.ones((3, 3))
+	assert(calculate_agreement(population,1,1,1)==3), "Test 7"
+	assert(calculate_agreement(population,1,1,-1)==5), "Test 8"
+	assert(calculate_agreement(population,1,1,10)==14), "Test 9"
+	assert(calculate_agreement(population,1,1,-10)==-6), "Test 10"
 
-    print("Tests passed")
+	print("Tests passed")
 
 
 def ising_main(population, alpha=None, external=0.0):
-    
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.set_axis_off()
-    im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
 
-    # Iterating an update 100 times
-    for frame in range(100):
-        # Iterating single steps 1000 times to form an update
-        for step in range(1000):
-            ising_step(population, external)
-        print('Step:', frame, end='\r')
-        plot_ising(im, population)
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_axis_off()
+	im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
+
+	# Iterating an update 100 times
+	for frame in range(100):
+		# Iterating single steps 1000 times to form an update
+		for step in range(1000):
+			ising_step(population, external)
+		print('Step:', frame, end='\r')
+		plot_ising(im, population)
 
 
 '''

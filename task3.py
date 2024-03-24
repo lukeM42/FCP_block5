@@ -4,11 +4,30 @@ import matplotlib.cm as cm
 
 class Node:
 
-	def __init__(self, value, number, connections=None):
+	def __init__(self, value, number, connections=None, parent = None):
 
 		self.index = number
 		self.connections = connections
 		self.value = value
+		self.parent = parent
+
+	def get_children_indexes(self):
+		# if there is a connected node at that index, add it to the list
+		return [i[0] for i in enumerate(self.connections) if i[1] == 1]
+
+
+class Queue:
+	def __init__(self):
+		self.queue = []
+	def push(self, item):
+		self.queue.append(item)
+	def pop(self):
+		if len(self.queue) < 1:
+			return None
+		return self.queue.pop(0)
+	def is_empty(self):
+		return len(self.queue)==0
+
 
 class Network:
 
@@ -48,7 +67,7 @@ class Network:
 
 		self.nodes = []
 		for node_number in range(N):
-			value = np.random.random()
+			value = node_number
 			connections = [0 for _ in range(N)]
 			self.nodes.append(Node(value, node_number, connections))
 
@@ -81,7 +100,7 @@ class Network:
 			node_x = network_radius * np.cos(node_angle)
 			node_y = network_radius * np.sin(node_angle)
 
-			circle = plt.Circle((node_x, node_y), 0.3*num_nodes, color=cm.hot(node.value))
+			circle = plt.Circle((node_x, node_y), 0.3*num_nodes, color=cm.hot(node.value/10))
 			ax.add_patch(circle)
 
 			for neighbour_index in range(i+1, num_nodes):
@@ -92,6 +111,29 @@ class Network:
 
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
 
+def breadth_first_search(start_node,end_node,nodes):
+	queue = Queue()
+	queue.push(start_node)
+	visited = []
+	while not queue.is_empty():
+		current_node = queue.pop()
+		if current_node == end_node:
+			break
+
+		for neighbour_index in current_node.get_children_indexes():
+			neighbour = nodes[neighbour_index]
+			if neighbour_index not in visited:
+				queue.push(neighbour)
+				visited.append(neighbour_index)
+				neighbour.parent = current_node
+	current_node = end_node
+	start_node.parent = None
+	path = []
+	while current_node.parent:
+		path.append(current_node)
+		current_node = current_node.parent
+	path.append(current_node)
+	return [node for node in path[::-1]]
 
 def test_networks():
 
@@ -147,6 +189,7 @@ def main():
 	network.make_random_network(10, 0.2)
 	network.plot()
 	print(network.get_mean_degree())
+	print(breadth_first_search(network.nodes[0],network.nodes[-1],network.nodes))
 	plt.show()
 
 
@@ -159,4 +202,3 @@ def main():
 
 if __name__=="__main__":
 	main()
-
