@@ -12,6 +12,10 @@ class Node:
 		self.parent = parent
 
 	def get_children_indexes(self):
+		'''
+		Returns the indexes of the nodes connected itself
+		:return:
+		'''
 		# if there is a connected node at that index, add it to the list
 		return [i[0] for i in enumerate(self.connections) if i[1] == 1]
 
@@ -49,7 +53,25 @@ class Network:
 			# this will sum the amount of connections that node has and adds it to a total
 		return total_degree / len(self.nodes) # calculates and then returns the mean
 
-	#def get_mean_path_length(self):
+	def get_mean_path_length(self):
+		'''
+		Calculates the mean value of a nodes path length to a connected node
+		It will then calculate and return the mean of the mean values for each node.
+		:return:
+		'''
+		mean_path_length = 0
+		for node1 in self.nodes:
+			total_path_length = 0
+			amount_reachable = 0
+			for node2 in self.nodes:
+				if not(node1 == node2) and breadth_first_search(node1, node2, self.nodes):
+					route = [node.value for node in breadth_first_search(node1, node2, self.nodes)]
+					path_length = len(route) - 1
+					total_path_length += path_length
+					amount_reachable += 1
+			if amount_reachable:
+				mean_path_length += total_path_length / amount_reachable
+		return mean_path_length / len(self.nodes)
 
 
 
@@ -84,7 +106,10 @@ class Network:
 		#Your code for task 4 goes here
 
 	def plot(self):
-
+		'''
+		Plots the network of nodes
+		:return:
+		'''
 		fig = plt.figure()
 		fig.set_facecolor('blue')##################TO_REMOVE########used so that it's easier to see nodes
 		ax = fig.add_subplot(111)
@@ -112,6 +137,14 @@ class Network:
 					ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
 
 def breadth_first_search(start_node,end_node,nodes):
+	'''
+	Completes a breadth first search from one value to another in a set of nodes, if it can't find the end node
+	due to it not being reachable, it will return False, otherwise it returns the path through the nodes.
+	:param start_node: The node to start the search from.
+	:param end_node: The node to search for.
+	:param nodes: A list containing the set of nodes
+	:return:
+	'''
 	queue = Queue()
 	queue.push(start_node)
 	visited = []
@@ -120,12 +153,11 @@ def breadth_first_search(start_node,end_node,nodes):
 		if current_node == end_node:
 			break
 
-		for neighbour_index in current_node.get_children_indexes():
-			neighbour = nodes[neighbour_index]
-			if neighbour_index not in visited:
-				queue.push(neighbour)
-				visited.append(neighbour_index)
-				neighbour.parent = current_node
+		for child_node_index in current_node.get_children_indexes():
+			if nodes[child_node_index] not in visited:
+				queue.push(nodes[child_node_index])
+				visited.append(nodes[child_node_index])
+				nodes[child_node_index].parent = current_node
 	current_node = end_node
 	start_node.parent = None
 	path = []
@@ -133,7 +165,11 @@ def breadth_first_search(start_node,end_node,nodes):
 		path.append(current_node)
 		current_node = current_node.parent
 	path.append(current_node)
-	return [node for node in path[::-1]]
+	path = [node for node in path[::-1]] # reverses the path order so it goes from start to finish
+	if start_node.value == path[0].value and end_node.value == path[-1].value:
+		return path
+	else:
+		return False
 
 def test_networks():
 
@@ -186,10 +222,10 @@ def test_networks():
 def main():
 	#You should write some code for handling flags here
 	network = Network()
-	network.make_random_network(10, 0.2)
+	network.make_random_network(5, 0.2)
 	network.plot()
-	print(network.get_mean_degree())
-	print(breadth_first_search(network.nodes[0],network.nodes[-1],network.nodes))
+	print("mean degree", network.get_mean_degree())
+	print("mean path length", network.get_mean_path_length())
 	plt.show()
 
 
