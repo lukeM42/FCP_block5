@@ -101,11 +101,44 @@ class Network:
 					node.connections[neighbour_index] = 1
 					self.nodes[neighbour_index].connections[index] = 1
 
-	#def make_ring_network(self, N, neighbour_range=1):
-		#Your code  for task 4 goes here
+	def make_ring_network(self, N, neighbour_range=1):
+		self.nodes = []
+		for i in range(N):
+			connections = [0 for i in range(N)]
+			connections[i-1] = 1
+			if i+1 < N:
+				connections[i+1] = 1
+			else:
+				connections[0] = 1
+			self.nodes.append(Node(np.random.random(),i,connections))
 
-	#def make_small_world_network(self, N, re_wire_prob=0.2):
-		#Your code for task 4 goes here
+
+	def make_small_world_network(self, N, re_wire_prob=0.2):
+		self.nodes = []
+		for node_number in range(N):
+			value = np.random.random()
+			connections = [0 for _ in range(N)]
+			self.nodes.append(Node(value, node_number, connections))
+
+		for (index, node) in enumerate(self.nodes):
+			for neighbour_index in range(index - 2, index + 3):
+				if neighbour_index - index:
+					if np.random.random() < re_wire_prob:
+						random_index = int(np.random.random() * N)
+						while random_index == index and N > 1:  # N>1 needed to prevent while true loop
+							# Generates a random index until the random index isn't the index of the node itself
+							random_index = int(np.random.random() * N)
+						node.connections[random_index] = 1
+						self.nodes[random_index].connections[index] = 1
+					else:
+						if neighbour_index < N:
+							node.connections[neighbour_index] = 1
+							self.nodes[neighbour_index].connections[index] = 1
+						else:
+							node.connections[neighbour_index-N] = 1
+							self.nodes[neighbour_index-N].connections[index] = 1
+
+
 
 	def plot(self):
 
@@ -123,7 +156,8 @@ class Network:
 			node_x = network_radius * np.cos(node_angle)
 			node_y = network_radius * np.sin(node_angle)
 
-			circle = plt.Circle((node_x, node_y), 0.3 * num_nodes, color=cm.hot(node.value))
+			circle = plt.Circle((node_x, node_y), 0.6 * num_nodes, color=cm.hot(node.value))
+			#circle = plt.Circle((node_x, node_y), 0.3 * num_nodes, color=cm.hot(node.value))
 			ax.add_patch(circle)
 
 			for neighbour_index in range(i + 1, num_nodes):
@@ -221,7 +255,9 @@ def test_networks():
 def main():
 	#You should write some code for handling flags here
 	network = Network()
-	network.make_random_network(5, 0.3)
+	#network.make_random_network(5, 0.3)
+	#network.make_ring_network(20)
+	network.make_small_world_network(10,0.5)
 	network.plot()
 	print("mean degree", network.get_mean_degree())
 	print("mean path length", network.get_mean_path_length())
