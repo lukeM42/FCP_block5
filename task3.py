@@ -74,11 +74,13 @@ class Network:
 		return mean_path_length / len(self.nodes)
 
 
-
-
-	#def get_mean_clustering(self):
-		#Your code for task 3 goes here
-
+	def get_mean_clustering(self):
+		total_clustering_coeff = 0
+		for node in self.nodes:
+			n = sum(node.connections)
+			if (n * (n - 1) / 2):
+				total_clustering_coeff += 1 / (n * (n - 1) / 2)
+		return total_clustering_coeff / len(self.nodes)
 
 
 	def make_random_network(self, N, connection_probability):
@@ -152,7 +154,6 @@ def breadth_first_search(start_node,end_node,nodes):
 		current_node = queue.pop()
 		if current_node == end_node:
 			break
-
 		for child_node_index in current_node.get_children_indexes():
 			if nodes[child_node_index] not in visited:
 				queue.push(nodes[child_node_index])
@@ -167,8 +168,10 @@ def breadth_first_search(start_node,end_node,nodes):
 	path.append(current_node)
 	path = [node for node in path[::-1]] # reverses the path order so it goes from start to finish
 	if start_node.value == path[0].value and end_node.value == path[-1].value:
+		# if it was able to complete the path return it
 		return path
 	else:
+		# otherwise return False
 		return False
 
 def test_networks():
@@ -222,10 +225,11 @@ def test_networks():
 def main():
 	#You should write some code for handling flags here
 	network = Network()
-	network.make_random_network(5, 0.2)
+	network.make_random_network(5, 0.3)
 	network.plot()
 	print("mean degree", network.get_mean_degree())
 	print("mean path length", network.get_mean_path_length())
+	print("mean clustering coeff", network.get_mean_clustering())
 	plt.show()
 
 
