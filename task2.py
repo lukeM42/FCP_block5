@@ -415,9 +415,42 @@ def ising_main(population, alpha=None, external=0.0):
 This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
+def update_opinions(opinions,T,b):
+    updated_opinions = opinions
+    for person1 in range(100):
+        person2 = int(100*np.random.rand())
+        opinion1 = opinions[person1]
+        opinion2 = opinions[person2]
 
-# def defuant_main():
-# Your code for task 2 goes here
+        if ((opinion1 - opinion2)**2)**0.5 < T:
+            updated_opinions[person1] = opinion1 + b * (opinion2 - opinion1)
+            updated_opinions[person2] = opinion2 + b * (opinion1 - opinion2)
+
+    return updated_opinions
+
+
+def defuant_main():
+    T = 0.2
+    b = 0.1
+    opinions = np.random.rand(100)
+    fig = plt.figure()
+
+    graph1 = fig.add_subplot(121)
+    graph2 = fig.add_subplot(122)
+
+    graph2.scatter([0 for i in range(100)],opinions,c = 'red')
+
+    for t in range(1,100):
+        opinions = update_opinions(opinions,T,b)
+        graph2.scatter([t for i in range(100)],opinions,c = 'red')
+
+    sorted_opinions = [np.round(opinion, decimals=1) for opinion in opinions]
+    graph1.hist(sorted_opinions, bins=11)
+
+    plt.show()
+
+
+
 
 # def test_defuant():
 # Your code for task 2 goes here
@@ -432,22 +465,8 @@ This section contains code for the main function- you should write some code for
 
 def main():
     # You should write some code for handling flags here
+    defuant_main()
 
-    test_networks()
-
-    network = Network()
-    network.make_ring_network(10)
-    network.plot()
-    plt.show()
-    print("Ring network mean degree:", network.get_mean_degree())
-    print("Ring network mean clustering coefficient:", network.get_clustering())
-    print("Ring network mean path length:", network.get_path_length())
-    network.make_small_world_network(20, 1)
-    network.plot()
-    plt.show()
-    print("Small world network mean degree:", network.get_mean_degree())
-    print("Small world network mean clustering coefficient:", network.get_clustering())
-    print("Small world network mean path length:", network.get_path_length())
 
 
 if __name__ == "__main__":
