@@ -443,7 +443,10 @@ def defuant_main():
     fig = plt.figure()
 
     graph1 = fig.add_subplot(121)
+    plt.xlabel('Opinions')
+    plt.xlim([0,1])
     graph2 = fig.add_subplot(122)
+
 
     graph2.scatter([0 for i in range(100)],opinions,c = 'red')
 
@@ -451,16 +454,14 @@ def defuant_main():
         opinions = update_opinions(opinions,T,b)
         graph2.scatter([t for i in range(100)],opinions,c = 'red')
 
-    sorted_opinions = [np.round(opinion, decimals=1) for opinion in opinions]
-    graph1.hist(sorted_opinions, bins=11)
-
+    graph1.hist(opinions,bins=[i/10 for i in range(11)])
+    plt.ylabel('Opinions')
+    plt.ylim([0, 1])
     plt.show()
 
 
-
-
-# def test_defuant():
-# Your code for task 2 goes here
+def test_defuant():
+        print("Testing defuant")
 
 
 '''
