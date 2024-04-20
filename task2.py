@@ -417,9 +417,9 @@ This section contains code for the Defuant Model - task 2 in the assignment
 '''
 def update_opinions(opinions,T,b):
     updated_opinions = opinions
-    for person1 in range(100):
+    for person1 in range(len(opinions)):
         if np.random.rand() > 0.5:
-            if person1 == 99:
+            if person1 == len(opinions)-1:
                 person2 = 0
             else:
                 person2 = person1 + 1
@@ -430,10 +430,14 @@ def update_opinions(opinions,T,b):
         opinion2 = opinions[person2]
 
         if ((opinion1 - opinion2)**2)**0.5 < T:
-            updated_opinions[person1] = opinion1 + b * (opinion2 - opinion1)
-            updated_opinions[person2] = opinion2 + b * (opinion1 - opinion2)
+            updated_opinions[person1] = changed_opinion(opinion1,opinion2,b)
+            updated_opinions[person2] = changed_opinion(opinion2,opinion1,b)
 
     return updated_opinions
+
+
+def changed_opinion(opinionA, opinionB, b):
+    return opinionA + b * (opinionB - opinionA)
 
 
 def defuant_main():
@@ -448,11 +452,11 @@ def defuant_main():
     graph2 = fig.add_subplot(122)
 
 
-    graph2.scatter([0 for i in range(100)],opinions,c = 'red')
+    graph2.scatter([0 for i in range(len(opinions))],opinions,c = 'red')
 
     for t in range(1,100):
         opinions = update_opinions(opinions,T,b)
-        graph2.scatter([t for i in range(100)],opinions,c = 'red')
+        graph2.scatter([t for i in range(len(opinions))],opinions,c = 'red')
 
     graph1.hist(opinions,bins=[i/10 for i in range(11)])
     plt.ylabel('Opinions')
@@ -461,7 +465,15 @@ def defuant_main():
 
 
 def test_defuant():
-        print("Testing defuant")
+    print("Testing defuant")
+    opinions = [0.1,0.9]
+    updated = [0.1,0.9]
+    assert (update_opinions(opinions, 0.5, 0.2) == updated), "Test 1"
+    assert (np.round(changed_opinion(0.2,0.4,0.2),4) == 0.24), "Test 2"
+    assert (np.round(changed_opinion(0, 1, 0.5), 4) == 0.5), "Test 3"
+
+    print("All tests passed")
+
 
 
 '''
@@ -474,6 +486,7 @@ This section contains code for the main function- you should write some code for
 def main():
     # You should write some code for handling flags here
     defuant_main()
+    test_defuant()
 
 
 
