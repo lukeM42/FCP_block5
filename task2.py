@@ -418,7 +418,14 @@ This section contains code for the Defuant Model - task 2 in the assignment
 def update_opinions(opinions,T,b):
     updated_opinions = opinions
     for person1 in range(100):
-        person2 = int(100*np.random.rand())
+        if np.random.rand() > 0.5:
+            if person1 == 99:
+                person2 = 0
+            else:
+                person2 = person1 + 1
+        else:
+            person2 = person1 - 1
+
         opinion1 = opinions[person1]
         opinion2 = opinions[person2]
 
@@ -430,8 +437,8 @@ def update_opinions(opinions,T,b):
 
 
 def defuant_main():
-    T = 0.2
-    b = 0.1
+    T = 0.5
+    b = 0.5
     opinions = np.random.rand(100)
     fig = plt.figure()
 
