@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-import argparse
+
 
 class Node:
 
@@ -13,9 +13,9 @@ class Node:
 
     def get_neighbour_indexes(self):
         '''
-		Returns the indexes of the nodes connected itself
-		:return:
-		'''
+        Returns the indexes of the nodes connected itself
+        :return:
+        '''
         # if there is a connected node at that index, add it to the list to return
         return [i[0] for i in enumerate(self.connections) if i[1] == 1]
 
@@ -47,9 +47,9 @@ class Network:
 
     def get_mean_degree(self):
         '''
-		This function calculates the mean degree value for all the nodes in a network
-		A nodes degree value is equal to how many edges it has
-		'''
+        This function calculates the mean degree value for all the nodes in a network
+        A nodes degree value is equal to how many edges it has
+        '''
         total_degree = 0
         for node in self.nodes:
             # iterates through each node
@@ -59,9 +59,9 @@ class Network:
 
     def get_clustering(self):
         '''
-		Calculates and returns the mean clustering coefficient of all the nodes
-		:return:
-		'''
+        Calculates and returns the mean clustering coefficient of all the nodes
+        :return:
+        '''
         total_clustering_coeff = 0
         for node in self.nodes:
             # iterate through each node
@@ -80,10 +80,10 @@ class Network:
 
     def get_path_length(self):
         '''
-		Calculates the mean value of a nodes path length to a connected node
-		It will then calculate and return the mean of the mean values for each node.
-		:return:
-		'''
+        Calculates the mean value of a nodes path length to a connected node
+        It will then calculate and return the mean of the mean values for each node.
+        :return:
+        '''
         mean_path_length = 0
         for node1 in self.nodes:
             # iterates through each node
@@ -98,20 +98,20 @@ class Network:
                     path_length = len(route) - 1
                     total_path_length += path_length
                     amount_reachable += 1
-            # as there must be a possible path between nodes, the end node must be reachable
+                # as there must be a possible path between nodes, the end node must be reachable
             if amount_reachable:
                 # if statement to prevent divide by 0 error
                 mean_path_length += total_path_length / amount_reachable
-        # calculates the mean path length of that node
+            # calculates the mean path length of that node
         return mean_path_length / len(self.nodes)
 
     # caculates the mean of the mean path length for each node and returns it
 
     def make_random_network(self, N, connection_probability):
         '''
-		This function makes a *random* network of size N.
-		Each node is connected to each other node with probability p
-		'''
+        This function makes a *random* network of size N.
+        Each node is connected to each other node with probability p
+        '''
 
         self.nodes = []
         for node_number in range(N):
@@ -127,11 +127,11 @@ class Network:
 
     def make_ring_network(self, N, neighbour_range=1):
         '''
-		creates a ring network with the amount of nodes N and range 1
-		:param N:
-		:param neighbour_range:
-		:return:
-		'''
+        creates a ring network with the amount of nodes N and range 1
+        :param N:
+        :param neighbour_range:
+        :return:
+        '''
         self.nodes = []
         for index in range(N):
             connections = [0 for index in range(N)]
@@ -198,13 +198,13 @@ class Network:
 
 def breadth_first_search(start_node, end_node, nodes):
     '''
-	Completes a breadth first search from one value to another in a set of nodes, if it can't find the end node
-	due to it not being reachable, it will return False, otherwise it returns the path through the nodes.
-	:param start_node: The node to start the search from.
-	:param end_node: The node to search for.
-	:param nodes: A list containing the set of nodes
-	:return:
-	'''
+    Completes a breadth first search from one value to another in a set of nodes, if it can't find the end node
+    due to it not being reachable, it will return False, otherwise it returns the path through the nodes.
+    :param start_node: The node to start the search from.
+    :param end_node: The node to search for.
+    :param nodes: A list containing the set of nodes
+    :return:
+    '''
     queue = Queue()
     queue.push(start_node)
     visited = []
@@ -223,7 +223,7 @@ def breadth_first_search(start_node, end_node, nodes):
                 # add it to visited now even though it's not yet been visited as it will be visited and
                 # adding it now prevents the possibility of it being added to the queue multipul times
                 nodes[neighbour_index].parent = current_node
-        # set its parent to the current node so that it leads back to the start node through the parents
+            # set its parent to the current node so that it leads back to the start node through the parents
     start_node.parent = None
     path = []
     while current_node.parent:
@@ -243,11 +243,11 @@ def breadth_first_search(start_node, end_node, nodes):
 
 def amount_neighbour_connections(main_node, nodes, connections=0):
     '''
-	calculates the amount of neighbour to neighbour connections a nodes neighbours have
-	:param main_node: node to look at neighbours from
-	:param nodes: array containing the nodes
-	:return:
-	'''
+    calculates the amount of neighbour to neighbour connections a nodes neighbours have
+    :param main_node: node to look at neighbours from
+    :param nodes: array containing the nodes
+    :return:
+    '''
     neighbours = [nodes[neighbour_index] for neighbour_index in main_node.get_neighbour_indexes()]
     # gets the neighbour nodes that are connected to the main node
     for neighbour1 in neighbours:
@@ -318,14 +318,14 @@ This section contains code for the Ising Model - task 1 in the assignment
 
 def calculate_agreement(population, row, col, external=0.0):
     '''
-	This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
-	Inputs: population (numpy array)
-			row (int)
-			col (int)
-			external (float)
-	Returns:
-			change_in_agreement (float)
-	'''
+    This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
+    Inputs: population (numpy array)
+            row (int)
+            col (int)
+            external (float)
+    Returns:
+            change_in_agreement (float)
+    '''
 
     # Your code for task 1 goes here
 
@@ -334,10 +334,10 @@ def calculate_agreement(population, row, col, external=0.0):
 
 def ising_step(population, external=0.0):
     '''
-	This function will perform a single update of the Ising model
-	Inputs: population (numpy array)
-			external (float) - optional - the magnitude of any external "pull" on opinion
-	'''
+    This function will perform a single update of the Ising model
+    Inputs: population (numpy array)
+            external (float) - optional - the magnitude of any external "pull" on opinion
+    '''
 
     n_rows, n_cols = population.shape
     row = np.random.randint(0, n_rows)
@@ -353,8 +353,8 @@ def ising_step(population, external=0.0):
 
 def plot_ising(im, population):
     '''
-	This function will display a plot of the Ising model
-	'''
+    This function will display a plot of the Ising model
+    '''
 
     new_im = np.array([[255 if val == -1 else 1 for val in rows] for rows in population], dtype=np.int8)
     im.set_data(new_im)
@@ -363,8 +363,8 @@ def plot_ising(im, population):
 
 def test_ising():
     '''
-	This function will test the calculate_agreement function in the Ising model
-	'''
+    This function will test the calculate_agreement function in the Ising model
+    '''
 
     print("Testing ising model calculations")
     population = -np.ones((3, 3))
@@ -432,11 +432,6 @@ This section contains code for the main function- you should write some code for
 
 def main():
     # You should write some code for handling flags here
-    parser = argparse.ArgumentParser()
-    parser.add_argument("")
-
-
-
 
     test_networks()
 
