@@ -412,87 +412,86 @@ This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
 def update_opinions(opinions,T,b):
-    """
-    updates a list of opinions, returns the updated list
-    """
-    updated_opinions = opinions
-    # creates a separate array to add the new opinions onto
-    for person1 in range(len(opinions)):
-        # iterates through all the opinions
-        if np.random.rand() > 0.5:
-            # uses a 50/50 chance to pick which neighbour is used
-            if person1 == len(opinions)-1:
-                person2 = 0
-            else:
-                person2 = person1 + 1
-            # additional if statement is needed to prevent out of bounds error
-        else:
-            person2 = person1 - 1
+	"""
+	updates a list of opinions, returns the updated list
+	"""
+	updated_opinions = opinions
+	# creates a separate array to add the new opinions onto
+	for person1 in range(len(opinions)):
+		# iterates through all the opinions
+		if np.random.rand() > 0.5:
+			# uses a 50/50 chance to pick which neighbour is used
+			if person1 == len(opinions)-1:
+				person2 = 0
+			else:
+				person2 = person1 + 1
+			# additional if statement is needed to prevent out of bounds error
+		else:
+			person2 = person1 - 1
 
-        opinion1 = opinions[person1]
-        opinion2 = opinions[person2]
+		opinion1 = opinions[person1]
+		opinion2 = opinions[person2]
 
-        if ((opinion1 - opinion2)**2)**0.5 < T:
-            # takes the magnitude of the difference of opinion and checks if its lower then the threshold
-            updated_opinions[person1] = changed_opinion(opinion1,opinion2,b)
-            updated_opinions[person2] = changed_opinion(opinion2,opinion1,b)
-            # updates both opinions
-    return updated_opinions
+		if ((opinion1 - opinion2)**2)**0.5 < T:
+			# takes the magnitude of the difference of opinion and checks if its lower then the threshold
+			updated_opinions[person1] = changed_opinion(opinion1,opinion2,b)
+			updated_opinions[person2] = changed_opinion(opinion2,opinion1,b)
+			# updates both opinions
+	return updated_opinions
 
 
 def changed_opinion(opinionA, opinionB, b):
-    '''
-    returns the updated opinionA, calculated using the formula, opinionA, opinionB and beta
-    '''
-    return opinionA + b * (opinionB - opinionA)
+	'''
+	returns the updated opinionA, calculated using the formula, opinionA, opinionB and beta
+	'''
+	return opinionA + b * (opinionB - opinionA)
 
 
-def defuant_main(b, T):
-    """
-    main function of the Defuant model
-    :return:
-    """
-    opinions = np.random.rand(100)
-    # creates a list of 100 random floats between 0 and 1
+def create_animation(opinion_evolution):
+	'''
+	Should create an animation of the opinions over time
+	'''
+	for i in range(len(opinion_evolution)):
+		plt.scatter([i for j in range(len(opinion_evolution[i]))],opinion_evolution[i])
+		plt.show()
 
-    fig = plt.figure()
-    graph1 = fig.add_subplot(121)
-    # adds the plot for the histogram
-    plt.xlabel('Opinions')
-    plt.xlim([0,1])
-    graph2 = fig.add_subplot(122)
-    # adds the plot for the opinions against the timestep
 
-    graph2.scatter([0 for i in range(len(opinions))],opinions,c = 'red')
-    # plots the initial set of opinions
-    for t in range(1, 101):
-        # iterates through the 100 time steps
-        opinions = update_opinions(opinions,T,b)
-        # calls function to update all the opinions each time
-        graph2.scatter([t for i in range(len(opinions))],opinions,c = 'red')
-        # plots the set of opinions for that time step
+def defuant_main(b, T, network=0):
+	opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
+	opinion_evolution = [opinions]
+	fig = plt.figure()
+	graph1 = fig.add_subplot(121)# adds the plot for the histogram
+	plt.xlabel('Opinions')
+	plt.xlim([0,1])
+	graph2 = fig.add_subplot(122)# adds the plot for the opinions against the timestep
+	graph2.scatter([0 for i in range(len(opinions))],opinions,c = 'red')# plots the initial set of opinions
+	for t in range(1, 101):# iterates through the 100 time steps
+		opinions = update_opinions(opinions,T,b) # calls function to update all the opinions each time
+		graph2.scatter([t for i in range(len(opinions))],opinions,c = 'red') # plots the set of opinions for that time step
+		opinion_evolution.append(opinions)
 
-    graph1.hist(opinions,bins=[i/10 for i in range(11)])
-    # creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
-    plt.ylabel('Opinions')
-    plt.ylim([0, 1])
-    plt.show()
-    # displays the plots
+	if not(network):
+		graph1.hist(opinions,bins=[i/10 for i in range(11)])# creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+		plt.ylabel('Opinions')
+		plt.ylim([0, 1])
+		plt.show()
+	else:
+		create_animation(opinion_evolution)
 
 
 def test_defuant():
-    """
-    Tests the Defaunt model functions
-    """
-    print("Testing Defuant model")
-    opinions = [0.1,0.9]
-    updated = [0.1,0.9]
-    # tests threshold check
-    assert (update_opinions(opinions, 0.5, 0.2) == updated), "Test 1"
-    # tests if the opinions are changed correctly
-    assert (np.round(changed_opinion(0.2,0.4,0.2),4) == 0.24), "Test 2"
-    assert (np.round(changed_opinion(0, 1, 0.5), 4) == 0.5), "Test 3"
-    print("All tests passed")
+	"""
+	Tests the Defaunt model functions
+	"""
+	print("Testing Defuant model")
+	opinions = [0.1,0.9]
+	updated = [0.1,0.9]
+	# tests threshold check
+	assert (update_opinions(opinions, 0.5, 0.2) == updated), "Test 1"
+	# tests if the opinions are changed correctly
+	assert (np.round(changed_opinion(0.2,0.4,0.2),4) == 0.24), "Test 2"
+	assert (np.round(changed_opinion(0, 1, 0.5), 4) == 0.5), "Test 3"
+	print("All tests passed")
 
 
 
@@ -503,6 +502,16 @@ This section contains code for the main function- you should write some code for
 '''
 
 def main():
+	#/////////////////////////// code to test task 5 easier
+	defuant_main(0.2, 0.2, 1)
+
+
+
+
+
+
+
+	#/////////////////////////////
 	network = Network()
 	#You should write some code for handling flags here
 	parser = argparse.ArgumentParser()
@@ -546,7 +555,7 @@ def main():
 			args.beta = args.beta[0]
 		if type(args.threshold) == list:
 			args.threshold = args.threshold[0]
-		defuant_main(args.beta,args.threshold)
+		defuant_main(args.beta, args.threshold)
 
 	# Network flag handling
 	if args.test_network:
