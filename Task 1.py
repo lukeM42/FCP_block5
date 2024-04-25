@@ -1,47 +1,39 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 
-
-def calculate_agreement(population, row, col, external=0.0):
-    '''
-    This function should return the *change* in agreement that would result if the cell at (row, col) was to flip its value
-    Inputs: population (numpy array)
-          row (int)
-          col (int)
-          external (float)
-    Returns:
-          change_in_agreement (float)
-    '''
-
-    # Your code for task 1 goes here
-
-    upper_neighbour_agreement = (population[row, col + 1]) * (population[row, col])
-    lower_neighbour_agreement = (population[row, col - 1]) * (population[row, col])
-    left_neighbour_agreement = (population[row[-1], col]) * (population[row, col])
-    right_neighbour_agreement = (population[row[+1], col]) * (population[row, col])
+def calculate_agreement(population, row, col, external=0.0, alpha=1.0):
+    # Calculate current agreement
+    lower_neighbour_agreement = ((population[row + 1, col]) * (population[row, col]) + (external * population[row,col]))
+    upper_neighbour_agreement = (population[row - 1, col]) * (population[row, col] + (external * population[row,col]))
+    left_neighbour_agreement = (population[row, col-1]) * (population[row, col] + (external * population[row,col]))
+    right_neighbour_agreement = (population[row, col+1]) * (population[row, col] + (external * population[row,col]))
     agreement = upper_neighbour_agreement + lower_neighbour_agreement + left_neighbour_agreement + right_neighbour_agreement
+    print(agreement, "agreement")
+    print(lower_neighbour_agreement, "lower")
+    print(population[row,col], "before flip")
+    # Flip the value at the specified position
+    population[row, col] *= -1
+    print(population[row, col], "after flip")
 
-    if agreement < 0:
-        population[row, col] *= -1
-        flipped_upper_neighbour_agreement = (population[row, col + 1]) * (population[row, col])
-        flipped_lower_neighbour_agreement = (population[row, col - 1]) * (population[row, col])
-        flipped_left_neighbour_agreement = (population[row[-1], col]) * (population[row, col])
-        flipped_right_neighbour_agreement = (population[row[+1], col]) * (population[row, col])
-        flipped_agreement = (flipped_upper_neighbour_agreement + flipped_lower_neighbour_agreement +
-                             flipped_left_neighbour_agreement + flipped_right_neighbour_agreement)
-    # would want to calculate probability around here
-    # maybe use random library to flip with calculated probability
+    # Calculate agreement after flipping
+    flipped_upper_neighbour_agreement = (population[row-1, col]) * (population[row, col]) + (external * population[row,col])
+    flipped_lower_neighbour_agreement = (population[row+1, col]) * (population[row, col]) + (external * population[row,col])
+    flipped_left_neighbour_agreement = (population[row, col-1]) * (population[row, col]) + (external * population[row,col])
+    flipped_right_neighbour_agreement = (population[row, col+1]) * (population[row, col]) + (external * population[row,col])
+    flipped_agreement = (flipped_upper_neighbour_agreement + flipped_lower_neighbour_agreement +
+                                flipped_left_neighbour_agreement + flipped_right_neighbour_agreement)
+    print(flipped_agreement, "flipped")
 
+    # Calculate change in agreement
     change_in_agreement = agreement - flipped_agreement
-    p = np.exp(-(change_in_agreement)/alpha)
+    print(change_in_agreement, "change")
 
     return change_in_agreement
 
-    # return np.random * population
 
-
-def ising_step(population, external=0.0):
+def ising_step(population, external=0.0, alpha=1.0):
     '''
     This function will perform a single update of the Ising model
     Inputs: population (numpy array)
@@ -51,14 +43,19 @@ def ising_step(population, external=0.0):
     n_rows, n_cols = population.shape
     row = np.random.randint(0, n_rows)
     col = np.random.randint(0, n_cols)
-    for row in n_rows:
-        for col in n_cols:
-            agreement = calculate_agreement(population, row, col, external=0.0)
 
-            if agreement < 0:
-                population[row, col] *= -1
+    p=np.exp(-(calculate_agreement(population,row,col,external=0.0,alpha=1.0))/alpha)
+    cutoff = random.random()
+    if cutoff < p:  # only flips value based on the calculated probability
+        population[row, col] *= -1
+        calculate_agreement(population,row,col)
 
-    # Your code for task 1 goes here
+    agreement = calculate_agreement(population, row, col, external=0.0,alpha=1.0)
+    if agreement < 0:
+        population[row, col] *= -1
+        calculate_agreement(population, row, col)
+
+
 
 
 def plot_ising(im, population):
@@ -99,8 +96,8 @@ def test_ising():
     population = -np.ones((3, 3))
     assert (calculate_agreement(population, 1, 1, 1) == 3), "Test 7"
     assert (calculate_agreement(population, 1, 1, -1) == 5), "Test 8"
-    assert (calculate_agreement(population, 1, 1, 10) == 14), "Test 9"
-    assert (calculate_agreement(population, 1, 1, -10) == -6), "Test 10"
+    assert (calculate_agreement(population, 1, 1, 10) == -6), "Test 9"
+    assert (calculate_agreement(population, 1, 1, -10) == 14), "Test 10"
 
     print("Tests passed")
 
@@ -118,3 +115,5 @@ def ising_main(population, alpha=None, external=0.0):
             ising_step(population, external)
         print('Step:', frame, end='\r')
         plot_ising(im, population)
+
+test_ising()
