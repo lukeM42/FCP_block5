@@ -1,0 +1,43 @@
+import random
+import matplotlib.pyplot as plt
+
+def initialize_population(size, opinion_range=(0, 1)):
+    return [random.uniform(opinion_range[0], opinion_range[1]) for _ in range(size)]
+
+def update_opinions(population, beta, threshold):
+    size = len(population)
+    for i in range(size):
+        neighbor = (i + 1) % size
+        if abs(population[i] - population[neighbor]) < threshold:
+            mean_opinion = (population[i] + population[neighbor]) / 2
+            population[i] += beta * (mean_opinion - population[i])
+            population[neighbor] += beta * (mean_opinion - population[neighbor])
+    return population
+
+def plot_opinions(population, timestep):
+    plt.figure(figsize=(10, 4))
+    plt.scatter(range(len(population)), population, c='blue', alpha=0.5)
+    plt.title(f"Opinion distribution at timestep {timestep}")
+    plt.xlabel("Individual")
+    plt.ylabel("Opinion")
+    plt.ylim(0, 1)
+    plt.show()
+
+def simulate_opinion_dynamics(size=100, num_steps=100, beta=0.1, threshold=0.2):
+    population = initialize_population(size)
+    for t in range(num_steps):
+        population = update_opinions(population, beta, threshold)
+        if t % 10 == 0:
+            plot_opinions(population, t)
+
+def test_defuant():
+    test_population = [0.1, 0.9]
+    beta, threshold = 0.5, 0.8
+    updated_population = update_opinions(test_population[:], beta, threshold)
+    expected_population = [(0.1 + 0.9) / 2, (0.1 + 0.9) / 2]
+    assert all(abs(up - ep) < 1e-6 for up, ep in zip(updated_population, expected_population)), "Opinion update failed under threshold."
+    print("All tests passed")
+
+if __name__ == "__main__":
+    test_defuant()
+	  main()
