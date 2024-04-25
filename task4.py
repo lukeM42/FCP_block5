@@ -261,53 +261,7 @@ def amount_neighbour_connections(main_node, nodes, connections=0):
 # returns the amount of connections. / 2 is needed as each connection is counted twice
 
 
-def test_networks():
-    # Ring network
-    nodes = []
-    num_nodes = 10
-    for node_number in range(num_nodes):
-        connections = [0 for val in range(num_nodes)]
-        connections[(node_number - 1) % num_nodes] = 1
-        connections[(node_number + 1) % num_nodes] = 1
-        new_node = Node(0, node_number, connections=connections)
-        nodes.append(new_node)
-    network = Network(nodes)
-
-    print("Testing ring network")
-    assert (network.get_mean_degree() == 2), network.get_mean_degree()
-    assert (network.get_clustering() == 0), network.get_clustering()
-    assert (network.get_path_length() == 2.777777777777778), network.get_path_length()
-
-    nodes = []
-    num_nodes = 10
-    for node_number in range(num_nodes):
-        connections = [0 for val in range(num_nodes)]
-        connections[(node_number + 1) % num_nodes] = 1
-        new_node = Node(0, node_number, connections=connections)
-        nodes.append(new_node)
-    network = Network(nodes)
-
-    print("Testing one-sided network")
-    assert (network.get_mean_degree() == 1), network.get_mean_degree()
-    assert (network.get_clustering() == 0), network.get_clustering()
-    assert (network.get_path_length() == 5), network.get_path_length()
-
-    nodes = []
-    num_nodes = 10
-    for node_number in range(num_nodes):
-        connections = [1 for val in range(num_nodes)]
-        connections[node_number] = 0
-        new_node = Node(0, node_number, connections=connections)
-        nodes.append(new_node)
-    network = Network(nodes)
-
-    print("Testing fully connected network")
-    assert (network.get_mean_degree() == num_nodes - 1), network.get_mean_degree()
-    assert (network.get_clustering() == 1), network.get_clustering()
-    assert (network.get_path_length() == 1), network.get_path_length()
-
-    print("All tests passed")
-
+this
 
 '''
 ==============================================================================================================
@@ -432,8 +386,6 @@ This section contains code for the main function- you should write some code for
 
 def main():
     # You should write some code for handling flags here
-    parser = argparse.ArgumentParser()
-    parser.add_argument("")
 
 
 

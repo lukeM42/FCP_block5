@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import argparse
+
 
 
 class Node:
@@ -445,13 +447,11 @@ def changed_opinion(opinionA, opinionB, b):
     return opinionA + b * (opinionB - opinionA)
 
 
-def defuant_main():
+def defuant_main(b, T):
     """
     main function of the Defuant model
     :return:
     """
-    T = 0.5  # the threshold value
-    b = 0.5  # the coupling parameter beta
     opinions = np.random.rand(100)
     # creates a list of 100 random floats between 0 and 1
 
@@ -503,26 +503,83 @@ This section contains code for the main function- you should write some code for
 '''
 
 def main():
-	#You should write some code for handling flags here
-
-
-	test_networks()
-	test_defuant()
-	defuant_main()
-	
 	network = Network()
-	network.make_ring_network(10)
-	network.plot()
-	plt.show()
-	print("Ring network mean degree:",network.get_mean_degree())
-	print("Ring network mean clustering coefficient:",network.get_clustering())
-	print("Ring network mean path length:",network.get_path_length())
-	network.make_small_world_network(20,1)
-	network.plot()
-	plt.show()
-	print("Small world network mean degree:", network.get_mean_degree())
-	print("Small world network mean clustering coefficient:", network.get_clustering())
-	print("Small world network mean path length:", network.get_path_length())
+	#You should write some code for handling flags here
+	parser = argparse.ArgumentParser()
+
+	# Ising model flags
+	parser.add_argument("-ising_model", action='store_true')
+	parser.add_argument("-external", nargs=1, default=0, type=int)
+	parser.add_argument("-alpha", nargs=1, default=0, type=int)
+	parser.add_argument("-test_ising", action='store_true')
+
+	# Defuant model flags
+	parser.add_argument("-defuant", action='store_true')
+	parser.add_argument("-beta", nargs=1, default=0.2, type=float)
+	parser.add_argument("-threshold", nargs=1, default=0.2, type=float)
+	parser.add_argument("-test_defuant",action='store_true')
+
+	# Networks flags
+	parser.add_argument("-network", nargs=1, default=-1, type=int)
+	parser.add_argument("-test_network", action='store_true')
+	parser.add_argument("-probability", nargs=1, default=0.3, type=float)
+
+	# Ring and small world network flags
+	parser.add_argument("-ring_network", nargs=1, type=int, default=-1)
+	parser.add_argument("-small_world", nargs=1, type=int, default=-1)
+	parser.add_argument("-re_wire", nargs=1, type=float, default=0.2)
+
+	args = parser.parse_args()
+
+	# Ising model flag handling
+
+	# Defuant model flag handling
+	if args.test_defuant:
+		test_defuant()
+	if args.defuant:
+		if type(args.beta) == list:
+			args.beta = args.beta[0]
+		if type(args.threshold) == list:
+			args.threshold = args.threshold[0]
+		defuant_main(args.beta,args.threshold)
+
+	# Network flag handling
+	if args.test_network:
+		test_networks()
+
+	if type(args.network) == list:
+		args.network = args.network[0]
+		network.make_random_network(args.network,args.probability)
+		network.plot()
+		plt.show()
+		print("Random network mean degree:", network.get_mean_degree())
+		print("Random network mean clustering coefficient:", network.get_clustering())
+		print("Random network mean path length:", network.get_path_length())
+
+	# Ring and Small world flag handling
+	if type(args.ring_network) == list:
+		args.ring_network = args.ring_network[0]
+		network.make_ring_network(args.ring_network, 1)
+		network.plot()
+		plt.show()
+		print("Ring network mean degree:", network.get_mean_degree())
+		print("Ring network mean clustering coefficient:", network.get_clustering())
+		print("Ring network mean path length:", network.get_path_length())
+
+	if type(args.small_world) == list:
+		args.small_world = args.small_world[0]
+		if type(args.re_wire) == list:
+			args.re_wire = args.re_wire[0]
+		network.make_small_world_network(args.small_world,args.re_wire)
+		network.plot()
+		plt.show()
+		print("Small world network mean degree:", network.get_mean_degree())
+		print("Small world network mean clustering coefficient:", network.get_clustering())
+		print("Small world network mean path length:", network.get_path_length())
+
+
+
+
 
 if __name__=="__main__":
 	main()
