@@ -529,6 +529,11 @@ def main():
 	parser.add_argument("-small_world", nargs=1, type=int, default=-1)
 	parser.add_argument("-re_wire", nargs=1, type=float, default=0.2)
 
+	# Opinion formation on networks flags
+	parser.add_argument("-use_network", nargs=1, type=int, default=-1)
+
+
+
 	args = parser.parse_args()
 
 	# Ising model flag handling
