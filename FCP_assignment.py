@@ -439,6 +439,21 @@ def update_opinions(opinions,T,b):
 			# updates both opinions
 	return updated_opinions
 
+def update_opinion_network(opinion_nodes,T,b):
+	updated_opinion_nodes = opinion_nodes
+	# creates a separate array to add the new opinions onto
+	for person1_index in range(len(opinion_nodes)):
+		connected_indexes = opinion_nodes[person1_index].get_neighbour_indexes()
+		for person2_index in connected_indexes:
+			opinion1 = opinion_nodes[person1_index].value
+			opinion2 = opinion_nodes[person2_index].value
+
+			if ((opinion1 - opinion2)**2)**0.5 < T:
+				# takes the magnitude of the difference of opinion and checks if its lower then the threshold
+				updated_opinion_nodes[person1_index].value = changed_opinion(opinion1,opinion2,b)
+				updated_opinion_nodes[person2_index].value = changed_opinion(opinion2,opinion1,b)
+				# updates both opinions
+	return updated_opinion_nodes
 
 def changed_opinion(opinionA, opinionB, b):
 	'''
@@ -451,13 +466,18 @@ def create_animation(opinion_evolution):
 	'''
 	Should create an animation of the opinions over time
 	'''
-	for i in range(len(opinion_evolution)):
-		plt.scatter([i for j in range(len(opinion_evolution[i]))],opinion_evolution[i])
-		plt.show()
+	#for i in range(len(opinion_evolution)):
+		#plt.scatter([i for j in range(len(opinion_evolution[i]))],opinion_evolution[i])
+		#plt.show()
+	print("Animation")
 
 
-def defuant_main(b, T, network=0):
-	opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
+def defuant_main(b, T, network=None):
+	if network:
+		opinions = [node.value for node in network.nodes]
+	else:
+		opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
+
 	opinion_evolution = [opinions]
 	fig = plt.figure()
 	graph1 = fig.add_subplot(121)# adds the plot for the histogram
@@ -466,17 +486,22 @@ def defuant_main(b, T, network=0):
 	graph2 = fig.add_subplot(122)# adds the plot for the opinions against the timestep
 	graph2.scatter([0 for i in range(len(opinions))],opinions,c = 'red')# plots the initial set of opinions
 	for t in range(1, 101):# iterates through the 100 time steps
-		opinions = update_opinions(opinions,T,b) # calls function to update all the opinions each time
-		graph2.scatter([t for i in range(len(opinions))],opinions,c = 'red') # plots the set of opinions for that time step
-		opinion_evolution.append(opinions)
+		if network:
+			network.nodes = update_opinion_network(network.nodes, T, b)
+			opinions = [node.value for node in network.nodes]
+			graph2.scatter([t for i in range(len(opinions))], opinions,c='red')  # plots the set of opinions for that time step
+			opinion_evolution.append(opinions)
+		else:
+			opinions = update_opinions(opinions,T,b) # calls function to update all the opinions each time
+			graph2.scatter([t for i in range(len(opinions))],opinions,c = 'red') # plots the set of opinions for that time step
 
-	if not(network):
-		graph1.hist(opinions,bins=[i/10 for i in range(11)])# creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
-		plt.ylabel('Opinions')
-		plt.ylim([0, 1])
-		plt.show()
-	else:
-		create_animation(opinion_evolution)
+	#if not(network):
+	graph1.hist(opinions,bins=[i/10 for i in range(11)])# creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+	plt.ylabel('Opinions')
+	plt.ylim([0, 1])
+	plt.show()
+	#else:
+	#	create_animation(opinion_evolution)
 
 
 def test_defuant():
@@ -502,8 +527,11 @@ This section contains code for the main function- you should write some code for
 '''
 
 def main():
+	network = Network()
 	#/////////////////////////// code to test task 5 easier
-	defuant_main(0.2, 0.2, 1)
+
+	network.make_small_world_network(100, 0.2)
+	defuant_main(0.2, 0.2, network)
 
 
 
@@ -512,7 +540,6 @@ def main():
 
 
 	#/////////////////////////////
-	network = Network()
 	#You should write some code for handling flags here
 	parser = argparse.ArgumentParser()
 
@@ -542,7 +569,6 @@ def main():
 	parser.add_argument("-use_network", nargs=1, type=int, default=-1)
 
 
-
 	args = parser.parse_args()
 
 	# Ising model flag handling
@@ -555,7 +581,13 @@ def main():
 			args.beta = args.beta[0]
 		if type(args.threshold) == list:
 			args.threshold = args.threshold[0]
-		defuant_main(args.beta, args.threshold)
+
+		if type(args.use_network) == list:
+			args.use_network = args.use_network[0]
+			network.make_random_network(args.network, args.probability)
+			defuant_main(args.beta, args.threshold, network)
+		else:
+			defuant_main(args.beta, args.threshold)
 
 	# Network flag handling
 	if args.test_network:
@@ -563,7 +595,7 @@ def main():
 
 	if type(args.network) == list:
 		args.network = args.network[0]
-		network.make_random_network(args.network,args.probability)
+		network.make_small_world_network(args.network,0.2)
 		network.plot()
 		plt.show()
 		print("Random network mean degree:", network.get_mean_degree())
