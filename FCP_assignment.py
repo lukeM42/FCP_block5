@@ -466,9 +466,11 @@ def create_animation(opinion_evolution):
 	'''
 	Should create an animation of the opinions over time
 	'''
-	#for i in range(len(opinion_evolution)):
-		#plt.scatter([i for j in range(len(opinion_evolution[i]))],opinion_evolution[i])
-		#plt.show()
+	plt.show(block=False)
+	for i in range(len(opinion_evolution)):
+		plt.scatter([i for j in range(len(opinion_evolution[i]))],opinion_evolution[i])
+		plt.draw()
+		plt.pause(0.001)
 	print("Animation")
 
 
@@ -495,13 +497,13 @@ def defuant_main(b, T, network=None):
 			opinions = update_opinions(opinions,T,b) # calls function to update all the opinions each time
 			graph2.scatter([t for i in range(len(opinions))],opinions,c = 'red') # plots the set of opinions for that time step
 
-	#if not(network):
-	graph1.hist(opinions,bins=[i/10 for i in range(11)])# creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
-	plt.ylabel('Opinions')
-	plt.ylim([0, 1])
-	plt.show()
-	#else:
-	#	create_animation(opinion_evolution)
+	if not(network):
+		graph1.hist(opinions,bins=[i/10 for i in range(11)])# creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+		plt.ylabel('Opinions')
+		plt.ylim([0, 1])
+		plt.show()
+	else:
+		create_animation(opinion_evolution)
 
 
 def test_defuant():
