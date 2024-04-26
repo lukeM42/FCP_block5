@@ -1,4 +1,5 @@
 import numpy as np
+
 import matplotlib.pyplot as plt
 import random
 
@@ -16,18 +17,23 @@ def calculate_agreement(population, row, col, external=0.0, alpha = 1.0):
 
     num_rows, num_cols = population.shape # retrieves the number of rows on columns in given population array
     # Calculate current agreement
-    lower_neighbour_agreement = ((population[row + 1, col]) * (population[row, col]))
     if row == num_rows: # wraps around to top of array if on the bottom row
-        lower_neighbour_agreement = ((population[0, col]) * (population[row,col]))
-    upper_neighbour_agreement = (population[row - 1, col]) * (population[row, col])
+        lower_neighbour_agreement = ((population[0, col]) * (population[row, col]))
+    else:
+        lower_neighbour_agreement = ((population[row % num_rows, col]) * (population[row, col]))
     if row == 0: # wraps around to bottom of array if on the top row
-        upper_neighbour_agreement = (population[num_rows, col]) * (population[row,col])
-    left_neighbour_agreement = (population[row, col-1]) * (population[row, col])
+        upper_neighbour_agreement = (population[row % num_rows, col]) * (population[row, col])
+    else:
+        upper_neighbour_agreement = (population[row - 1, col]) * (population[row, col])
+
     if col == 0: # wraps around to right-most column if on left-most column
-        left_neighbour_agreement = (population[row, num_cols]) * (population[row,col])
-    right_neighbour_agreement = (population[row, col+1]) * (population[row, col])
+        left_neighbour_agreement = (population[row, col % num_cols]) * (population[row, col])
+    else:
+        left_neighbour_agreement = (population[row, col - 1]) * (population[row, col])
     if col == num_cols: # wraps around to left-most column if on right-most column
-        right_neighbour_agreement = (population[row,0]) * (population[row,col])
+        right_neighbour_agreement = (population[row, 0]) * (population[row, col])
+    else:
+        right_neighbour_agreement = (population[row, col % num_cols]) * (population[row, col])
     sum_of_agreements = upper_neighbour_agreement + lower_neighbour_agreement + left_neighbour_agreement + right_neighbour_agreement
     agreement = sum_of_agreements + (external * population[row, col]) # this adds the value of external if applicable
 
@@ -45,9 +51,9 @@ def ising_step(population, external=0.0, alpha=1.0):
     row = np.random.randint(0, n_rows)
     col = np.random.randint(0, n_cols)
 
-    p=np.exp(-(calculate_agreement(population,row,col,external=0.0,alpha=1.0))/alpha)
+    p=np.exp(-(calculate_agreement(population,row,col,external=0,alpha=0))/alpha)
     critical_value = random.random()
-    agreement = calculate_agreement()
+    agreement = calculate_agreement(population, row, col)
     if critical_value < p or agreement < 0:
         population[row, col] *= -1
 
@@ -97,7 +103,7 @@ def test_ising():
     print("Tests passed")
 
 
-def ising_main(population, alpha=None, external=0.0):
+def ising_main(population, alpha=None, external=None):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_axis_off()
@@ -110,5 +116,14 @@ def ising_main(population, alpha=None, external=0.0):
             ising_step(population, external)
         print('Step:', frame, end='\r')
         plot_ising(im, population)
+
+
+#population = np.random.randint(-1, 1 ,(3,3))
+population = np.ones((3,3))
+
+print(population)
+
+print(population.shape)
+ising_main(population, 0.01, 0)
 
 
