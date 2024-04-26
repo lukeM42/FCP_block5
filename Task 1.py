@@ -46,15 +46,8 @@ def ising_step(population, external=0.0, alpha=1.0):
 
     p=np.exp(-(calculate_agreement(population,row,col,external=0.0,alpha=1.0))/alpha)
     cutoff = random.random()
-    if cutoff < p:  # only flips value based on the calculated probability
+    if cutoff < p or agreement < 0:
         population[row, col] *= -1
-        calculate_agreement(population,row,col)
-
-    agreement = calculate_agreement(population, row, col, external=0.0,alpha=1.0)
-    if agreement < 0:
-        population[row, col] *= -1
-        calculate_agreement(population, row, col)
-
 
 
 
