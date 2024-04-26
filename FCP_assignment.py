@@ -169,10 +169,8 @@ class Network:
 							node.connections[neighbour_index - N] = 1
 							self.nodes[neighbour_index - N].connections[index] = 1
 
-	def plot(self):
+	def plot(self,ax):
 
-		fig = plt.figure()
-		ax = fig.add_subplot(111)
 		ax.set_axis_off()
 
 		num_nodes = len(self.nodes)
@@ -465,33 +463,32 @@ def changed_opinion(opinionA, opinionB, b):
 def defuant_main(b, T, network=None):
 	if network:
 		opinions = [node.value for node in network.nodes]
-	else:
-		opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
-
-	opinion_evolution = [opinions]
-	fig = plt.figure()
-	graph1 = fig.add_subplot(121)# adds the plot for the histogram
-	plt.xlabel('Opinions')
-	plt.xlim([0,1])
-	graph2 = fig.add_subplot(122)# adds the plot for the opinions against the timestep
-	graph2.scatter([0 for i in range(len(opinions))],opinions,c = 'red')# plots the initial set of opinions
-	for t in range(1, 101):# iterates through the 100 time steps
-		if network:
+		opinion_evolution = [network.nodes]
+		for t in range(1, 101):  # iterates through the 100 time steps
 			network.nodes = update_opinion_network(network.nodes, T, b)
 			opinions = [node.value for node in network.nodes]
-			graph2.scatter([t for i in range(len(opinions))], opinions,c='red')  # plots the set of opinions for that time step
-			opinion_evolution.append(opinions)
-		else:
-			opinions = update_opinions(opinions,T,b) # calls function to update all the opinions each time
-			graph2.scatter([t for i in range(len(opinions))],opinions,c = 'red') # plots the set of opinions for that time step
+			opinion_evolution.append(network.nodes)
+			#for i in range(len(opinion_evolution)):
+				#network.nodes = opinion_evolution[i]
+				#network.plot()
+				#plt.pause(0.001)
 
-	if not(network):
-		graph1.hist(opinions,bins=[i/10 for i in range(11)])# creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+	else:
+		opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
+		fig = plt.figure()
+		graph1 = fig.add_subplot(121)# adds the plot for the histogram
+		plt.xlabel('Opinions')
+		plt.xlim([0,1])
+		graph2 = fig.add_subplot(122)# adds the plot for the opinions against the timestep
+		graph2.scatter([0 for i in range(len(opinions))],opinions, c='red')# plots the initial set of opinions
+		for t in range(1, 101):  # iterates through the 100 time steps
+			opinions = update_opinions(opinions, T, b)  # calls function to update all the opinions each time
+			graph2.scatter([t for i in range(len(opinions))], opinions, c='red')  # plots the set of opinions for that time step
+		graph1.hist(opinions, bins=[i / 10 for i in range(11)])  # creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
 		plt.ylabel('Opinions')
 		plt.ylim([0, 1])
 		plt.show()
-	else:
-		create_animation(opinion_evolution)
+
 
 
 def test_defuant():
@@ -520,7 +517,7 @@ def main():
 	network = Network()
 	#/////////////////////////// code to test task 5 easier
 
-	network.make_small_world_network(100, 0.2)
+	network.make_small_world_network(20, 0.2)
 	defuant_main(0.2, 0.2, network)
 
 
