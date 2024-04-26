@@ -3,34 +3,35 @@ import matplotlib.pyplot as plt
 import random
 
 
-def calculate_agreement(population, row, col, external=0.0, alpha=1.0):
+def calculate_agreement(population, row, col, external=0.0, alpha = 1.0):
+    '''
+    	This function should return the extent to which a cell agrees with its neighbours.
+    	Inputs: population (numpy array)
+    			row (int)
+    			col (int)
+    			external (float)
+    	Returns:
+    			change_in_agreement (float)
+    	'''
+
+    num_rows, num_cols = population.shape # retrieves the number of rows on columns in given population array
     # Calculate current agreement
-    lower_neighbour_agreement = ((population[row + 1, col]) * (population[row, col]) + (external * population[row,col]))
-    upper_neighbour_agreement = (population[row - 1, col]) * (population[row, col] + (external * population[row,col]))
-    left_neighbour_agreement = (population[row, col-1]) * (population[row, col] + (external * population[row,col]))
-    right_neighbour_agreement = (population[row, col+1]) * (population[row, col] + (external * population[row,col]))
-    agreement = upper_neighbour_agreement + lower_neighbour_agreement + left_neighbour_agreement + right_neighbour_agreement
-    print(agreement, "agreement")
-    print(lower_neighbour_agreement, "lower")
-    print(population[row,col], "before flip")
-    # Flip the value at the specified position
-    population[row, col] *= -1
-    print(population[row, col], "after flip")
+    lower_neighbour_agreement = ((population[row + 1, col]) * (population[row, col]))
+    if row == num_rows: # wraps around to top of array if on the bottom row
+        lower_neighbour_agreement = ((population[0, col]) * (population[row,col]))
+    upper_neighbour_agreement = (population[row - 1, col]) * (population[row, col])
+    if row == 0: # wraps around to bottom of array if on the top row
+        upper_neighbour_agreement = (population[num_rows, col]) * (population[row,col])
+    left_neighbour_agreement = (population[row, col-1]) * (population[row, col])
+    if col == 0: # wraps around to right-most column if on left-most column
+        left_neighbour_agreement = (population[row, num_cols]) * (population[row,col])
+    right_neighbour_agreement = (population[row, col+1]) * (population[row, col])
+    if col == num_cols: # wraps around to left-most column if on right-most column
+        right_neighbour_agreement = (population[row,0]) * (population[row,col])
+    sum_of_agreements = upper_neighbour_agreement + lower_neighbour_agreement + left_neighbour_agreement + right_neighbour_agreement
+    agreement = sum_of_agreements + (external * population[row, col]) # this adds the value of external if applicable
 
-    # Calculate agreement after flipping
-    flipped_upper_neighbour_agreement = (population[row-1, col]) * (population[row, col]) + (external * population[row,col])
-    flipped_lower_neighbour_agreement = (population[row+1, col]) * (population[row, col]) + (external * population[row,col])
-    flipped_left_neighbour_agreement = (population[row, col-1]) * (population[row, col]) + (external * population[row,col])
-    flipped_right_neighbour_agreement = (population[row, col+1]) * (population[row, col]) + (external * population[row,col])
-    flipped_agreement = (flipped_upper_neighbour_agreement + flipped_lower_neighbour_agreement +
-                                flipped_left_neighbour_agreement + flipped_right_neighbour_agreement)
-    print(flipped_agreement, "flipped")
-
-    # Calculate change in agreement
-    change_in_agreement = agreement - flipped_agreement
-    print(change_in_agreement, "change")
-
-    return change_in_agreement
+    return agreement
 
 
 def ising_step(population, external=0.0, alpha=1.0):
@@ -46,6 +47,7 @@ def ising_step(population, external=0.0, alpha=1.0):
 
     p=np.exp(-(calculate_agreement(population,row,col,external=0.0,alpha=1.0))/alpha)
     cutoff = random.random()
+    agreement = calculate_agreement()
     if cutoff < p or agreement < 0:
         population[row, col] *= -1
 
@@ -109,4 +111,4 @@ def ising_main(population, alpha=None, external=0.0):
         print('Step:', frame, end='\r')
         plot_ising(im, population)
 
-test_ising()
+
