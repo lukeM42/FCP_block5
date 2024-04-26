@@ -46,9 +46,9 @@ def ising_step(population, external=0.0, alpha=1.0):
     col = np.random.randint(0, n_cols)
 
     p=np.exp(-(calculate_agreement(population,row,col,external=0.0,alpha=1.0))/alpha)
-    cutoff = random.random()
+    critical_value = random.random()
     agreement = calculate_agreement()
-    if cutoff < p or agreement < 0:
+    if critical_value < p or agreement < 0:
         population[row, col] *= -1
 
 
