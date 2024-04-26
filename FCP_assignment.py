@@ -462,18 +462,6 @@ def changed_opinion(opinionA, opinionB, b):
 	return opinionA + b * (opinionB - opinionA)
 
 
-def create_animation(opinion_evolution):
-	'''
-	Should create an animation of the opinions over time
-	'''
-	plt.show(block=False)
-	for i in range(len(opinion_evolution)):
-		plt.scatter([i for j in range(len(opinion_evolution[i]))],opinion_evolution[i])
-		plt.draw()
-		plt.pause(0.001)
-	print("Animation")
-
-
 def defuant_main(b, T, network=None):
 	if network:
 		opinions = [node.value for node in network.nodes]
