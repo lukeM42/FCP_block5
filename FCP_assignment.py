@@ -171,7 +171,6 @@ class Network:
 
 	def plot(self,ax):
 
-		ax.set_axis_off()
 
 		num_nodes = len(self.nodes)
 		network_radius = num_nodes * 10
@@ -431,7 +430,7 @@ def update_opinions(opinions,T,b):
 		opinion2 = opinions[person2]
 
 		if ((opinion1 - opinion2)**2)**0.5 < T:
-			# takes the magnitude of the difference of opinion and checks if its lower then the threshold
+			# takes the magnitude of the difference of opinion and checks if it's lower than the threshold
 			updated_opinions[person1] = changed_opinion(opinion1,opinion2,b)
 			updated_opinions[person2] = changed_opinion(opinion2,opinion1,b)
 			# updates both opinions
@@ -463,15 +462,39 @@ def changed_opinion(opinionA, opinionB, b):
 def defuant_main(b, T, network=None):
 	if network:
 		opinions = [node.value for node in network.nodes]
+		plt.xlabel('Opinions')
+		plt.xlim([0, 1])
+		mean = [sum(opinions)]
 		opinion_evolution = [network.nodes]
+		print(opinions)
+		#network.plot()
+		#plt.show()
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
 		for t in range(1, 101):  # iterates through the 100 time steps
 			network.nodes = update_opinion_network(network.nodes, T, b)
 			opinions = [node.value for node in network.nodes]
 			opinion_evolution.append(network.nodes)
-			#for i in range(len(opinion_evolution)):
-				#network.nodes = opinion_evolution[i]
-				#network.plot()
-				#plt.pause(0.001)
+			mean.append(sum(opinions))
+			ax.cla()
+			ax.set_axis_off()
+			network.plot(ax)
+			plt.pause(0.03)
+		plt.show()
+		#for i in range(len(opinion_evolution)):
+		#	network.nodes = opinion_evolution[i]
+		#	network.plot(ax)
+		#	plt.pause(0.1)
+		#plt.cla()
+	#	graph1.hist(opinions, bins=[i / 10 for i in range(11)])  # creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+	#	plt.ylabel('Opinions')
+	#	plt.ylim([0, 1])
+	#	plt.show()
+	#	plt.plot([t for t in range(len(mean))], mean)
+	#	print(mean)
+	#	plt.show()
+		print(opinions)
+
 
 	else:
 		opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
@@ -517,8 +540,8 @@ def main():
 	network = Network()
 	#/////////////////////////// code to test task 5 easier
 
-	network.make_small_world_network(20, 0.2)
-	defuant_main(0.2, 0.2, network)
+	network.make_small_world_network(20, 0.1)
+	defuant_main(0.04, 0.35, network)
 
 
 
