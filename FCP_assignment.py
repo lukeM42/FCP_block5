@@ -461,40 +461,35 @@ def changed_opinion(opinionA, opinionB, b):
 
 def defuant_main(b, T, network=None):
 	if network:
-		opinions = [node.value for node in network.nodes]
-		plt.xlabel('Opinions')
-		plt.xlim([0, 1])
-		mean = [sum(opinions)]
-		opinion_evolution = [network.nodes]
-		print(opinions)
-		#network.plot()
-		#plt.show()
+		opinions = [node.value for node in network.nodes] # to track the values of the nodes across that timestep
+		mean = [np.mean(opinions)]
+		opinion_range = [max(opinions) - min(opinions)]
 		fig = plt.figure()
-		ax = fig.add_subplot(111)
+		ax = fig.add_subplot(111) # declares the animation plot outside the for loop so it redraws on same plot
 		for t in range(1, 101):  # iterates through the 100 time steps
-			network.nodes = update_opinion_network(network.nodes, T, b)
+			network.nodes = update_opinion_network(network.nodes, T, b) # updates the opinions
 			opinions = [node.value for node in network.nodes]
-			opinion_evolution.append(network.nodes)
-			mean.append(sum(opinions))
-			ax.cla()
+			mean.append(np.mean(opinions))
+			opinion_range.append(max(opinions) - min(opinions))
+			ax.cla() # clears the previous plot to re-draw the new one
 			ax.set_axis_off()
-			network.plot(ax)
-			plt.pause(0.03)
-		plt.show()
-		#for i in range(len(opinion_evolution)):
-		#	network.nodes = opinion_evolution[i]
-		#	network.plot(ax)
-		#	plt.pause(0.1)
-		#plt.cla()
-	#	graph1.hist(opinions, bins=[i / 10 for i in range(11)])  # creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
-	#	plt.ylabel('Opinions')
-	#	plt.ylim([0, 1])
-	#	plt.show()
-	#	plt.plot([t for t in range(len(mean))], mean)
-	#	print(mean)
-	#	plt.show()
-		print(opinions)
+			network.plot(ax) # plots the current network at that timestep
+			plt.pause(0.03) # displays the plot for 0.03 seconds
+		plt.show() # calling show here prevents the plot from immediately going after the last timestep
 
+		plt.title("Mean over timesteps")
+		plt.ylabel("Opinion")
+		plt.xlabel("Timestep")
+		plt.grid()
+		plt.plot([t for t in range(len(mean))], mean)
+		plt.show()
+
+		plt.title("Range of opinions over timesteps")
+		plt.ylabel("Opinion")
+		plt.xlabel("Timestep")
+		plt.grid()
+		plt.plot([t for t in range(len(opinion_range))], opinion_range)
+		plt.show()
 
 	else:
 		opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
@@ -538,18 +533,6 @@ This section contains code for the main function- you should write some code for
 
 def main():
 	network = Network()
-	#/////////////////////////// code to test task 5 easier
-
-	network.make_small_world_network(20, 0.1)
-	defuant_main(0.04, 0.35, network)
-
-
-
-
-
-
-
-	#/////////////////////////////
 	#You should write some code for handling flags here
 	parser = argparse.ArgumentParser()
 
@@ -593,8 +576,12 @@ def main():
 			args.threshold = args.threshold[0]
 
 		if type(args.use_network) == list:
+
 			args.use_network = args.use_network[0]
-			network.make_random_network(args.network, args.probability)
+			if type(args.re_wire) == list:
+				network.make_small_world_network(args.network, args.re_wire[0])
+			else:
+				network.make_small_world_network(args.use_network, args.re_wire)
 			defuant_main(args.beta, args.threshold, network)
 		else:
 			defuant_main(args.beta, args.threshold)
