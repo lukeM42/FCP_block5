@@ -512,17 +512,17 @@ def defuant_main(b, T, network=None):
 		plt.show()
 
 	else:
-		opinions = np.random.rand(100)# creates a list of 100 random floats between 0 and 1
+		opinions = np.random.rand(100)  # creates a list of 100 random floats between 0 and 1
 		fig = plt.figure()
-		graph1 = fig.add_subplot(121)# adds the plot for the histogram
+		graph1 = fig.add_subplot(121)  # adds the plot for the histogram
 		plt.xlabel('Opinions')
 		plt.xlim([0,1])
-		graph2 = fig.add_subplot(122)# adds the plot for the opinions against the timestep
-		graph2.scatter([0 for i in range(len(opinions))],opinions, c='red')# plots the initial set of opinions
+		graph2 = fig.add_subplot(122)  # adds the plot for the opinions against the timestep
+		graph2.scatter([0 for i in range(len(opinions))],opinions, c='red')  # plots the initial set of opinions
 		for t in range(1, 101):  # iterates through the 100 time steps
 			opinions = update_opinions(opinions, T, b)  # calls function to update all the opinions each time
 			graph2.scatter([t for i in range(len(opinions))], opinions, c='red')  # plots the set of opinions for that time step
-		graph1.hist(opinions, bins=[i / 10 for i in range(11)])  # creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+		graph1.hist(opinions, bins=[i / 10 for i in range(11)])  #creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
 		plt.ylabel('Opinions')
 		plt.ylim([0, 1])
 		plt.show()
@@ -581,7 +581,6 @@ def main():
 	# Opinion formation on networks flags
 	parser.add_argument("-use_network", nargs=1, type=int, default=-1)
 
-
 	args = parser.parse_args()
 
 	# Ising model flag handling
@@ -591,16 +590,17 @@ def main():
 		test_defuant()
 	if args.defuant:
 		if type(args.beta) == list:
-			args.beta = args.beta[0] # as passed in arguments are stored in lists, they therefore must be removed
-		if type(args.threshold) == list: # from the list before they can be used
+			args.beta = args.beta[0]  # as passed in arguments are stored in lists, they therefore must be removed
+		if type(args.threshold) == list:  # from the list before they can be used
 			args.threshold = args.threshold[0]
 		if type(args.use_network) == list:
 			args.use_network = args.use_network[0]
 			if type(args.re_wire) == list:
-				network.make_small_world_network(args.network, args.re_wire[0])
+				network.make_small_world_network(args.use_network, args.re_wire[0])
+				defuant_main(args.beta, args.threshold, network)
 			else:
 				network.make_small_world_network(args.use_network, args.re_wire)
-			defuant_main(args.beta, args.threshold, network)
+				defuant_main(args.beta, args.threshold, network)
 		else:
 			defuant_main(args.beta, args.threshold)
 
@@ -653,6 +653,6 @@ def main():
 		print("Small world network mean path length:", network.get_path_length())
 		# outputs details about that network
 
-
 if __name__=="__main__":
 	main()
+
