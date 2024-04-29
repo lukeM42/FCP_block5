@@ -437,6 +437,15 @@ def update_opinions(opinions,T,b):
 	return updated_opinions
 
 def update_opinion_network(opinion_nodes,T,b):
+	'''
+	Args:
+		opinion_nodes: A list of nodes containing each opinion
+		T: Threshold value
+		b: Beta value
+
+	Returns: The updated list of nodes
+
+	'''
 	updated_opinion_nodes = opinion_nodes
 	# creates a separate array to add the new opinions onto
 	for person1_index in range(len(opinion_nodes)):
@@ -454,12 +463,23 @@ def update_opinion_network(opinion_nodes,T,b):
 
 def changed_opinion(opinionA, opinionB, b):
 	'''
-	returns the updated opinionA, calculated using the formula, opinionA, opinionB and beta
+	Args:
+		opinionA: opinion of a person
+		opinionB: opinion of their neighbour
+		b: Beta value
+	Returns: the updated opinion of that person
+
 	'''
 	return opinionA + b * (opinionB - opinionA)
 
 
 def defuant_main(b, T, network=None):
+	'''
+	Args:
+		b: Beta value
+		T: Threshold value
+		network: network to use if one is supplied
+	'''
 	if network:
 		opinions = [node.value for node in network.nodes] # to track the values of the nodes across that timestep
 		mean = [np.mean(opinions)]
@@ -571,12 +591,10 @@ def main():
 		test_defuant()
 	if args.defuant:
 		if type(args.beta) == list:
-			args.beta = args.beta[0]
-		if type(args.threshold) == list:
+			args.beta = args.beta[0] # as passed in arguments are stored in lists, they therefore must be removed
+		if type(args.threshold) == list: # from the list before they can be used
 			args.threshold = args.threshold[0]
-
 		if type(args.use_network) == list:
-
 			args.use_network = args.use_network[0]
 			if type(args.re_wire) == list:
 				network.make_small_world_network(args.network, args.re_wire[0])
@@ -592,36 +610,48 @@ def main():
 
 	if type(args.network) == list:
 		args.network = args.network[0]
-		network.make_small_world_network(args.network,0.2)
-		network.plot()
+		network.make_random_network(args.network,0.2)
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.set_axis_off()
+		network.plot(ax)
 		plt.show()
+		# creates a random network of size N, then plots it
 		print("Random network mean degree:", network.get_mean_degree())
 		print("Random network mean clustering coefficient:", network.get_clustering())
 		print("Random network mean path length:", network.get_path_length())
+		# outputs details about that network
 
 	# Ring and Small world flag handling
 	if type(args.ring_network) == list:
 		args.ring_network = args.ring_network[0]
 		network.make_ring_network(args.ring_network, 1)
-		network.plot()
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.set_axis_off()
+		network.plot(ax)
 		plt.show()
+		# creates a ring network of size N and a neighbour range of 1, then plots it
 		print("Ring network mean degree:", network.get_mean_degree())
 		print("Ring network mean clustering coefficient:", network.get_clustering())
 		print("Ring network mean path length:", network.get_path_length())
+		# outputs details about that network
 
 	if type(args.small_world) == list:
 		args.small_world = args.small_world[0]
 		if type(args.re_wire) == list:
 			args.re_wire = args.re_wire[0]
 		network.make_small_world_network(args.small_world,args.re_wire)
-		network.plot()
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		ax.set_axis_off()
+		network.plot(ax)
 		plt.show()
+		# creates a small world network of size N with a rewiring probability of re_wire
 		print("Small world network mean degree:", network.get_mean_degree())
 		print("Small world network mean clustering coefficient:", network.get_clustering())
 		print("Small world network mean path length:", network.get_path_length())
-
-
-
+		# outputs details about that network
 
 
 if __name__=="__main__":
