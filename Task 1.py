@@ -1,46 +1,37 @@
 import numpy as np
-
 import matplotlib.pyplot as plt
 import random
+alpha = 0.1
+external = 0.0
 
 
-def calculate_agreement(population, row, col, external=0.0, alpha = 1.0):
+
+def calculate_agreement(population, row, col, external=0.0, alpha=1.0):
     '''
-    	This function should return the extent to which a cell agrees with its neighbours.
-    	Inputs: population (numpy array)
-    			row (int)
-    			col (int)
-    			external (float)
-    	Returns:
-    			change_in_agreement (float)
-    	'''
+    This function returns the extent to which a cell agrees with its neighbors.
+    Inputs: population (numpy array)
+            row (int)
+            col (int)
+            external (float)
+    Returns:
+            change_in_agreement (float)
+    '''
+    num_rows, num_cols = population.shape
 
-    num_rows, num_cols = population.shape # retrieves the number of rows on columns in given population array
     # Calculate current agreement
-    if row == num_rows: # wraps around to top of array if on the bottom row
-        lower_neighbour_agreement = ((population[0, col]) * (population[row, col]))
-    else:
-        lower_neighbour_agreement = ((population[row % num_rows, col]) * (population[row, col]))
-    if row == 0: # wraps around to bottom of array if on the top row
-        upper_neighbour_agreement = (population[row % num_rows, col]) * (population[row, col])
-    else:
-        upper_neighbour_agreement = (population[row - 1, col]) * (population[row, col])
+    lower_neighbour_agreement = population[(row + 1) % num_rows, col] * population[row, col]
+    upper_neighbour_agreement = population[(row - 1) % num_rows, col] * population[row, col]
+    left_neighbour_agreement = population[row, (col - 1) % num_cols] * population[row, col]
+    right_neighbour_agreement = population[row, (col + 1) % num_cols] * population[row, col]
 
-    if col == 0: # wraps around to right-most column if on left-most column
-        left_neighbour_agreement = (population[row, col % num_cols]) * (population[row, col])
-    else:
-        left_neighbour_agreement = (population[row, col - 1]) * (population[row, col])
-    if col == num_cols: # wraps around to left-most column if on right-most column
-        right_neighbour_agreement = (population[row, 0]) * (population[row, col])
-    else:
-        right_neighbour_agreement = (population[row, col % num_cols]) * (population[row, col])
-    sum_of_agreements = upper_neighbour_agreement + lower_neighbour_agreement + left_neighbour_agreement + right_neighbour_agreement
-    agreement = sum_of_agreements + (external * population[row, col]) # this adds the value of external if applicable
+    sum_of_agreements = upper_neighbour_agreement + lower_neighbour_agreement + \
+                        left_neighbour_agreement + right_neighbour_agreement
+    agreement = sum_of_agreements + (external * population[row, col])
 
     return agreement
 
 
-def ising_step(population, external=0.0, alpha=1.0):
+def ising_step(population, alpha, external):
     '''
     This function will perform a single update of the Ising model
     Inputs: population (numpy array)
@@ -50,13 +41,15 @@ def ising_step(population, external=0.0, alpha=1.0):
     n_rows, n_cols = population.shape
     row = np.random.randint(0, n_rows)
     col = np.random.randint(0, n_cols)
-
-    p=np.exp(-(calculate_agreement(population,row,col,external=0,alpha=0))/alpha)
-    critical_value = random.random()
     agreement = calculate_agreement(population, row, col)
+    p = np.exp(-(agreement) / alpha)
+    print(p, "p")
+
+    critical_value = random.random()
     if critical_value < p or agreement < 0:
         population[row, col] *= -1
 
+    return population
 
 
 def plot_ising(im, population):
@@ -103,7 +96,7 @@ def test_ising():
     print("Tests passed")
 
 
-def ising_main(population, alpha=None, external=None):
+def ising_main(population, alpha, external):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_axis_off()
@@ -113,17 +106,15 @@ def ising_main(population, alpha=None, external=None):
     for frame in range(100):
         # Iterating single steps 1000 times to form an update
         for step in range(1000):
-            ising_step(population, external)
+            ising_step(population, alpha, external)
         print('Step:', frame, end='\r')
         plot_ising(im, population)
 
 
-#population = np.random.randint(-1, 1 ,(3,3))
-population = np.ones((3,3))
-
-print(population)
-
-print(population.shape)
-ising_main(population, 0.01, 0)
+if __name__ == "__main__":
+    population = np.random.choice([-1, 1], size=(100, 100))
+    print(population)
+    ising_main(population, alpha, external)
+    print(population, "after")
 
 
