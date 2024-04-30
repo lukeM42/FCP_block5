@@ -347,7 +347,6 @@ def ising_step(population, alpha, external):
     col = np.random.randint(0, n_cols)
     agreement = calculate_agreement(population, row, col)
     p = np.exp(-(agreement) / alpha)
-    print(p, "p")
 
     critical_value = np.random.random()
     if critical_value < p or agreement < 0:
@@ -629,7 +628,9 @@ def main():
 
 	if type(args.network) == list:
 		args.network = args.network[0]
-		network.make_random_network(args.network,0.2)
+		if type(args.probability) == list:
+			args.probability = args.probability[0]
+		network.make_random_network(args.network,args.probability)
 		fig = plt.figure()
 		ax = fig.add_subplot(111)
 		ax.set_axis_off()
