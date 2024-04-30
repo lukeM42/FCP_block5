@@ -59,8 +59,8 @@ def plot_ising(im, population):
 
     new_im = np.array([[255 if val == -1 else 1 for val in rows] for rows in population], dtype=np.int8)
     im.set_data(new_im)
-    #plt.pause(0.1)
-    plt.show()
+    plt.pause(0.1)
+  #  plt.show()
 
 
 def test_ising():
@@ -98,6 +98,9 @@ def test_ising():
 
 
 def ising_main(population, alpha, external):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_axis_off()
 
     # Iterating an update 100 times
     for frame in range(100):
@@ -105,13 +108,8 @@ def ising_main(population, alpha, external):
         for step in range(1000):
             ising_step(population, alpha, external)
         #print('Step:', frame, end='\r')
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.set_axis_off()
         im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
         plot_ising(im, population)
-    print(True)
-
 
 
 if __name__ == "__main__":
