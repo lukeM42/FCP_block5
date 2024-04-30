@@ -538,19 +538,38 @@ def defuant_main(b, T, network=None):
 		plt.show()
 
 
-def test_defuant():
-	"""
-	Tests the Defaunt model functions
-	"""
-	print("Testing Defuant model")
-	opinions = [0.1,0.9]
-	updated = [0.1,0.9]
-	# tests threshold check
-	assert (update_opinions(opinions, 0.5, 0.2) == updated), "Test 1"
-	# tests if the opinions are changed correctly
-	assert (np.round(changed_opinion(0.2,0.4,0.2),4) == 0.24), "Test 2"
-	assert (np.round(changed_opinion(0, 1, 0.5), 4) == 0.5), "Test 3"
-	print("All tests passed")
+def test_ising():
+    '''
+    This function will test the calculate_agreement function in the Ising model
+    '''
+
+    print("Testing ising model calculations")
+    population = -np.ones((3, 3))
+    assert (calculate_agreement(population, 1, 1) == 4), "Test 1"
+
+    population[1, 1] = 1.
+    assert (calculate_agreement(population, 1, 1) == -4), "Test 2"
+
+    population[0, 1] = 1.
+    assert (calculate_agreement(population, 1, 1) == -2), "Test 3"
+
+    population[1, 0] = 1.
+    assert (calculate_agreement(population, 1, 1) == 0), "Test 4"
+
+    population[2, 1] = 1.
+    assert (calculate_agreement(population, 1, 1) == 2), "Test 5"
+
+    population[1, 2] = 1.
+    assert (calculate_agreement(population, 1, 1) == 4), "Test 6"
+
+    "Testing external pull"
+    population = -np.ones((3, 3))
+    assert (calculate_agreement(population, 1, 1, 1) == 3), "Test 7"
+    assert (calculate_agreement(population, 1, 1, -1) == 5), "Test 8"
+    assert (calculate_agreement(population, 1, 1, 10) == -6), "Test 9"
+    assert (calculate_agreement(population, 1, 1, -10) == 14), "Test 10"
+
+    print("Tests passed")
 
 
 '''

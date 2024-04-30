@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-alpha = 0.1
-external = 0.0
+#alpha = 0.1
+#external = 0.0
 
 
 
@@ -114,8 +114,9 @@ def ising_main(population, alpha, external):
 
 if __name__ == "__main__":
     population = np.random.choice([-1, 1], size=(100, 100))
-    print(population)
-    ising_main(population, alpha, external)
-    print(population, "after")
+   # print(population)
+    #ising_main(population, alpha, external)
+   # print(population, "after")
+    test_ising()
 
 
