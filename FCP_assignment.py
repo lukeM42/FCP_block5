@@ -366,38 +366,37 @@ def plot_ising(im, population):
 	plt.pause(0.1)
 
 def test_ising():
-	'''
-	This function will test the calculate_agreement function in the Ising model
-	'''
+    '''
+    This function will test the calculate_agreement function in the Ising model
+    '''
 
-	print("Testing ising model calculations")
-	population = -np.ones((3, 3))
-	assert(calculate_agreement(population,1,1)==4), "Test 1"
+    print("Testing ising model calculations")
+    population = -np.ones((3, 3))
+    assert (calculate_agreement(population, 1, 1) == 4), "Test 1"
 
-	population[1, 1] = 1.
-	assert(calculate_agreement(population,1,1)==-4), "Test 2"
+    population[1, 1] = 1.
+    assert (calculate_agreement(population, 1, 1) == -4), "Test 2"
 
-	population[0, 1] = 1.
-	assert(calculate_agreement(population,1,1)==-2), "Test 3"
+    population[0, 1] = 1.
+    assert (calculate_agreement(population, 1, 1) == -2), "Test 3"
 
-	population[1, 0] = 1.
-	assert(calculate_agreement(population,1,1)==0), "Test 4"
+    population[1, 0] = 1.
+    assert (calculate_agreement(population, 1, 1) == 0), "Test 4"
 
-	population[2, 1] = 1.
-	assert(calculate_agreement(population,1,1)==2), "Test 5"
+    population[2, 1] = 1.
+    assert (calculate_agreement(population, 1, 1) == 2), "Test 5"
 
-	population[1, 2] = 1.
-	assert(calculate_agreement(population,1,1)==4), "Test 6"
+    population[1, 2] = 1.
+    assert (calculate_agreement(population, 1, 1) == 4), "Test 6"
 
-	"Testing external pull"
-	population = -np.ones((3, 3))
-	assert(calculate_agreement(population,1,1,1)==3), "Test 7"
-	assert(calculate_agreement(population,1,1,-1)==5), "Test 8"
-	assert(calculate_agreement(population,1,1,10)==14), "Test 9"
-	assert(calculate_agreement(population,1,1,-10)==-6), "Test 10"
+    "Testing external pull"
+    population = -np.ones((3, 3))
+    assert (calculate_agreement(population, 1, 1, 1) == 3), "Test 7"
+    assert (calculate_agreement(population, 1, 1, -1) == 5), "Test 8"
+    assert (calculate_agreement(population, 1, 1, 10) == -6), "Test 9"
+    assert (calculate_agreement(population, 1, 1, -10) == 14), "Test 10"
 
-	print("Tests passed")
-
+    print("Tests passed")
 
 def ising_main(population, alpha, external):
     fig = plt.figure()
@@ -478,99 +477,82 @@ def changed_opinion(opinionA, opinionB, b):
 		opinionB: opinion of their neighbour
 		b: Beta value
 	Returns: the updated opinion of that person
-
 	'''
 	return opinionA + b * (opinionB - opinionA)
 
 
-def defuant_main(b, T, network=None):
+def defuant_main_network(b, T, network=None):
 	'''
 	Args:
 		b: Beta value
 		T: Threshold value
 		network: network to use if one is supplied
 	'''
-	if network:
-		opinions = [node.value for node in network.nodes] # to track the values of the nodes across that timestep
-		mean = [np.mean(opinions)]
-		opinion_range = [max(opinions) - min(opinions)]
-		fig = plt.figure()
-		ax = fig.add_subplot(111) # declares the animation plot outside the for loop so it redraws on same plot
-		for t in range(1, 101):  # iterates through the 100 time steps
-			network.nodes = update_opinion_network(network.nodes, T, b) # updates the opinions
-			opinions = [node.value for node in network.nodes]
-			mean.append(np.mean(opinions))
-			opinion_range.append(max(opinions) - min(opinions))
-			ax.cla() # clears the previous plot to re-draw the new one
-			ax.set_axis_off()
-			network.plot(ax) # plots the current network at that timestep
-			plt.pause(0.03) # displays the plot for 0.03 seconds
-		plt.show() # calling show here prevents the plot from immediately going after the last timestep
 
-		plt.title("Mean over timesteps")
-		plt.ylabel("Opinion")
-		plt.xlabel("Timestep")
-		plt.grid()
-		plt.plot([t for t in range(len(mean))], mean)
-		plt.show()
+	opinions = [node.value for node in network.nodes] # to track the values of the nodes across that timestep
+	mean = [np.mean(opinions)]
+	opinion_range = [max(opinions) - min(opinions)]
+	fig = plt.figure()
+	ax = fig.add_subplot(111) # declares the animation plot outside the for loop so it redraws on same plot
+	for t in range(1, 101):  # iterates through the 100 time steps
+		network.nodes = update_opinion_network(network.nodes, T, b) # updates the opinions
+		opinions = [node.value for node in network.nodes]
+		mean.append(np.mean(opinions))
+		opinion_range.append(max(opinions) - min(opinions))
+		ax.cla() # clears the previous plot to re-draw the new one
+		ax.set_axis_off()
+		network.plot(ax) # plots the current network at that timestep
+		plt.pause(0.03) # displays the plot for 0.03 seconds
+	plt.show() # calling show here prevents the plot from immediately going after the last timestep
+	plt.title("Mean over timesteps")
+	plt.ylabel("Opinion")
+	plt.xlabel("Timestep")
+	plt.grid()
+	plt.plot([t for t in range(len(mean))], mean)
+	plt.show()
 
-		plt.title("Range of opinions over timesteps")
-		plt.ylabel("Opinion")
-		plt.xlabel("Timestep")
-		plt.grid()
-		plt.plot([t for t in range(len(opinion_range))], opinion_range)
-		plt.show()
+	plt.title("Range of opinions over timesteps")
+	plt.ylabel("Opinion")
+	plt.xlabel("Timestep")
+	plt.grid()
+	plt.plot([t for t in range(len(opinion_range))], opinion_range)
+	plt.show()
 
-	else:
-		opinions = np.random.rand(100)  # creates a list of 100 random floats between 0 and 1
-		fig = plt.figure()
-		graph1 = fig.add_subplot(121)  # adds the plot for the histogram
-		plt.xlabel('Opinions')
-		plt.xlim([0,1])
-		graph2 = fig.add_subplot(122)  # adds the plot for the opinions against the timestep
-		graph2.scatter([0 for i in range(len(opinions))],opinions, c='red')  # plots the initial set of opinions
-		for t in range(1, 101):  # iterates through the 100 time steps
-			opinions = update_opinions(opinions, T, b)  # calls function to update all the opinions each time
-			graph2.scatter([t for i in range(len(opinions))], opinions, c='red')  # plots the set of opinions for that time step
-		graph1.hist(opinions, bins=[i / 10 for i in range(11)])  #creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
-		plt.ylabel('Opinions')
-		plt.ylim([0, 1])
-		plt.show()
+def defuant_main(b, T):
+	'''
+	Args:
+		b: Beta value
+		T: Threshold value
+	'''
+	opinions = np.random.rand(100)  # creates a list of 100 random floats between 0 and 1
+	fig = plt.figure()
+	graph1 = fig.add_subplot(121)  # adds the plot for the histogram
+	plt.xlabel('Opinions')
+	plt.xlim([0,1])
+	graph2 = fig.add_subplot(122)  # adds the plot for the opinions against the timestep
+	graph2.scatter([0 for i in range(len(opinions))],opinions, c='red')  # plots the initial set of opinions
+	for t in range(1, 101):  # iterates through the 100 time steps
+		opinions = update_opinions(opinions, T, b)  # calls function to update all the opinions each time
+		graph2.scatter([t for i in range(len(opinions))], opinions, c='red')  # plots the set of opinions for that time step
+	graph1.hist(opinions, bins=[i / 10 for i in range(11)])  #creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+	plt.ylabel('Opinions')
+	plt.ylim([0, 1])
+	plt.show()
 
 
-def test_ising():
-    '''
-    This function will test the calculate_agreement function in the Ising model
-    '''
-
-    print("Testing ising model calculations")
-    population = -np.ones((3, 3))
-    assert (calculate_agreement(population, 1, 1) == 4), "Test 1"
-
-    population[1, 1] = 1.
-    assert (calculate_agreement(population, 1, 1) == -4), "Test 2"
-
-    population[0, 1] = 1.
-    assert (calculate_agreement(population, 1, 1) == -2), "Test 3"
-
-    population[1, 0] = 1.
-    assert (calculate_agreement(population, 1, 1) == 0), "Test 4"
-
-    population[2, 1] = 1.
-    assert (calculate_agreement(population, 1, 1) == 2), "Test 5"
-
-    population[1, 2] = 1.
-    assert (calculate_agreement(population, 1, 1) == 4), "Test 6"
-
-    "Testing external pull"
-    population = -np.ones((3, 3))
-    assert (calculate_agreement(population, 1, 1, 1) == 3), "Test 7"
-    assert (calculate_agreement(population, 1, 1, -1) == 5), "Test 8"
-    assert (calculate_agreement(population, 1, 1, 10) == -6), "Test 9"
-    assert (calculate_agreement(population, 1, 1, -10) == 14), "Test 10"
-
-    print("Tests passed")
-
+def test_defuant():
+	"""
+	Tests the Defaunt model functions
+	"""
+	print("Testing Defuant model")
+	opinions = [0.1,0.9]
+	updated = [0.1,0.9]
+	# tests threshold check
+	assert (update_opinions(opinions, 0.5, 0.2) == updated), "Test 1"
+	# tests if the opinions are changed correctly
+	assert (np.round(changed_opinion(0.2,0.4,0.2),4) == 0.24), "Test 2"
+	assert (np.round(changed_opinion(0, 1, 0.5), 4) == 0.5), "Test 3"
+	print("All tests passed")
 
 '''
 ==============================================================================================================
@@ -634,10 +616,10 @@ def main():
 			args.use_network = args.use_network[0]
 			if type(args.re_wire) == list:
 				network.make_small_world_network(args.use_network, args.re_wire[0])
-				defuant_main(args.beta, args.threshold, network)
+				defuant_main_network(args.beta, args.threshold, network)
 			else:
 				network.make_small_world_network(args.use_network, args.re_wire)
-				defuant_main(args.beta, args.threshold, network)
+				defuant_main_network(args.beta, args.threshold, network)
 		else:
 			defuant_main(args.beta, args.threshold)
 
