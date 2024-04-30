@@ -98,10 +98,6 @@ def test_ising():
 
 
 def ising_main(population, alpha, external):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.set_axis_off()
-    im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
 
     # Iterating an update 100 times
     for frame in range(100):
@@ -109,11 +105,11 @@ def ising_main(population, alpha, external):
         for step in range(1000):
             ising_step(population, alpha, external)
         #print('Step:', frame, end='\r')
-        ax.cla()
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
         ax.set_axis_off()
         im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
         plot_ising(im, population)
-        plt.show()
     print(True)
 
 
