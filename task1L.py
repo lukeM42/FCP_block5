@@ -43,7 +43,7 @@ def ising_step(population, alpha, external):
     col = np.random.randint(0, n_cols)
     agreement = calculate_agreement(population, row, col)
     p = np.exp(-(agreement) / alpha)
-    print(p, "p")
+    #print(p, "p")
 
     critical_value = random.random()
     if critical_value < p or agreement < 0:
@@ -59,6 +59,7 @@ def plot_ising(im, population):
 
     new_im = np.array([[255 if val == -1 else 1 for val in rows] for rows in population], dtype=np.int8)
     im.set_data(new_im)
+    #plt.pause(0.1)
     plt.show()
 
 
@@ -107,14 +108,25 @@ def ising_main(population, alpha, external):
         # Iterating single steps 1000 times to form an update
         for step in range(1000):
             ising_step(population, alpha, external)
-        print('Step:', frame, end='\r')
+        #print('Step:', frame, end='\r')
+        ax.cla()
+        ax.set_axis_off()
+        im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
         plot_ising(im, population)
+        plt.show()
+    print(True)
+
 
 
 if __name__ == "__main__":
     population = np.random.choice([-1, 1], size=(100, 100))
-    print(population)
+    #print(population)
     ising_main(population, alpha, external)
-    print(population, "after")
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_axis_off()
+    im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
+    plot_ising(im, population)
+   # print(population, "after")
 
 

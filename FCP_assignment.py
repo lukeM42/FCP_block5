@@ -106,7 +106,7 @@ class Network:
 				mean_path_length += total_path_length / amount_reachable
 				# calculates the mean path length of that node
 		return mean_path_length / len(self.nodes)
-		# caculates the mean of the mean path length for each node and returns it
+		# calculates the mean of the mean path length for each node and returns it
 
 	def make_random_network(self, N, connection_probability):
 		'''
@@ -444,7 +444,6 @@ def update_opinion_network(opinion_nodes,T,b):
 		b: Beta value
 
 	Returns: The updated list of nodes
-
 	'''
 	updated_opinion_nodes = opinion_nodes
 	# creates a separate array to add the new opinions onto
@@ -528,7 +527,6 @@ def defuant_main(b, T, network=None):
 		plt.show()
 
 
-
 def test_defuant():
 	"""
 	Tests the Defaunt model functions
@@ -542,7 +540,6 @@ def test_defuant():
 	assert (np.round(changed_opinion(0.2,0.4,0.2),4) == 0.24), "Test 2"
 	assert (np.round(changed_opinion(0, 1, 0.5), 4) == 0.5), "Test 3"
 	print("All tests passed")
-
 
 
 '''
@@ -653,6 +650,6 @@ def main():
 		print("Small world network mean path length:", network.get_path_length())
 		# outputs details about that network
 
+
 if __name__=="__main__":
 	main()
-
