@@ -504,14 +504,14 @@ def defuant_main_network(b, T, network=None):
 		plt.pause(0.03) # displays the plot for 0.03 seconds
 	plt.show() # calling show here prevents the plot from immediately going after the last timestep
 	plt.title("Mean over timesteps")
-	plt.ylabel("Opinion")
+	plt.ylabel("Opinion mean")
 	plt.xlabel("Timestep")
 	plt.grid()
 	plt.plot([t for t in range(len(mean))], mean)
 	plt.show()
 
 	plt.title("Range of opinions over timesteps")
-	plt.ylabel("Opinion")
+	plt.ylabel("Opinion range")
 	plt.xlabel("Timestep")
 	plt.grid()
 	plt.plot([t for t in range(len(opinion_range))], opinion_range)
