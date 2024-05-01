@@ -11,7 +11,7 @@ class Node:
 
 		self.index = number
 		self.connections = connections
-		self.value = value
+		self.value = value 
 		self.parent = parent
 
 	def get_neighbour_indexes(self):
@@ -321,9 +321,11 @@ def calculate_agreement(population, row, col, external=0.0, alpha=1.0):
     Returns:
             change_in_agreement (float)
     '''
+    # retrieve the number of columns and rows of the array
     num_rows, num_cols = population.shape
 
-    # Calculate current agreement
+    # calculate current agreement
+    # includes logic to implement circular boundary conditions
     lower_neighbour_agreement = population[(row + 1) % num_rows, col] * population[row, col]
     upper_neighbour_agreement = population[(row - 1) % num_rows, col] * population[row, col]
     left_neighbour_agreement = population[row, (col - 1) % num_cols] * population[row, col]
@@ -331,6 +333,7 @@ def calculate_agreement(population, row, col, external=0.0, alpha=1.0):
 
     sum_of_agreements = upper_neighbour_agreement + lower_neighbour_agreement + \
                         left_neighbour_agreement + right_neighbour_agreement
+    # implements "external" extension
     agreement = sum_of_agreements + (external * population[row, col])
 
     return agreement
@@ -343,12 +346,16 @@ def ising_step(population, alpha, external):
     '''
 
     n_rows, n_cols = population.shape
+    # choose random element in array to simulate
     row = np.random.randint(0, n_rows)
     col = np.random.randint(0, n_cols)
+    # calls function to attain agreement value of the current array element
     agreement = calculate_agreement(population, row, col)
+    # implementing the probability of flip extension
     p = np.exp(-(agreement) / alpha)
-
+    # gives random chance of flipping based on probability
     critical_value = np.random.random()
+    # flips current element if either given condition is met
     if critical_value < p or agreement < 0:
         population[row, col] *= -1
 
