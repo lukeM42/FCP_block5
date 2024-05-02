@@ -3,12 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
 
-
-
 class Node:
-
 	def __init__(self, value, number, connections=None, parent=None):
-
 		self.index = number
 		self.connections = connections
 		self.value = value 
@@ -117,7 +113,7 @@ class Network:
 		self.nodes = []
 		for node_number in range(N):
 			value = np.random.random()
-			connections = [0 for _ in range(N)]
+			connections = [0 for i in range(N)]
 			self.nodes.append(Node(value, node_number, connections))
 
 		for (index, node) in enumerate(self.nodes):
@@ -313,125 +309,131 @@ def test_networks():
 
 	print("All tests passed")
 
+
 '''
 ==============================================================================================================
 This section contains code for the Ising Model - task 1 in the assignment
 ==============================================================================================================
 '''
 
+
 def calculate_agreement(population, row, col, external=0.0, alpha=1.0):
-    '''
-    This function returns the extent to which a cell agrees with its neighbors.
-    Inputs: population (numpy array)
-            row (int)
-            col (int)
-            external (float)
-    Returns:
-            change_in_agreement (float)
-    '''
-    # retrieve the number of columns and rows of the array
-    num_rows, num_cols = population.shape
+	'''
+	This function returns the extent to which a cell agrees with its neighbors.
+	Inputs: population (numpy array)
+			row (int)
+			col (int)
+			external (float)
+	Returns:
+			change_in_agreement (float)
+	'''
+	# retrieve the number of columns and rows of the array
+	num_rows, num_cols = population.shape
 
-    # calculate current agreement
-    # includes logic to implement circular boundary conditions
-    lower_neighbour_agreement = population[(row + 1) % num_rows, col] * population[row, col]
-    upper_neighbour_agreement = population[(row - 1) % num_rows, col] * population[row, col]
-    left_neighbour_agreement = population[row, (col - 1) % num_cols] * population[row, col]
-    right_neighbour_agreement = population[row, (col + 1) % num_cols] * population[row, col]
+	# calculate current agreement
+	# includes logic to implement circular boundary conditions
+	lower_neighbour_agreement = population[(row + 1) % num_rows, col] * population[row, col]
+	upper_neighbour_agreement = population[(row - 1) % num_rows, col] * population[row, col]
+	left_neighbour_agreement = population[row, (col - 1) % num_cols] * population[row, col]
+	right_neighbour_agreement = population[row, (col + 1) % num_cols] * population[row, col]
 
-    sum_of_agreements = upper_neighbour_agreement + lower_neighbour_agreement + \
-                        left_neighbour_agreement + right_neighbour_agreement
-    # implements "external" extension
-    agreement = sum_of_agreements + (external * population[row, col])
+	sum_of_agreements = upper_neighbour_agreement + lower_neighbour_agreement + \
+						left_neighbour_agreement + right_neighbour_agreement
+	# implements "external" extension
+	agreement = sum_of_agreements + (external * population[row, col])
 
-    return agreement
+	return agreement
+
 
 def ising_step(population, alpha, external):
-    '''
-    This function will perform a single update of the Ising model
-    Inputs: population (numpy array)
-          external (float) - optional - the magnitude of any external "pull" on opinion
-    '''
+	'''
+	This function will perform a single update of the Ising model
+	Inputs: population (numpy array)
+		  external (float) - optional - the magnitude of any external "pull" on opinion
+	'''
+	n_rows, n_cols = population.shape
+	# choose random element in array to simulate
+	row = np.random.randint(0, n_rows)
+	col = np.random.randint(0, n_cols)
+	# calls function to attain agreement value of the current array element
+	agreement = calculate_agreement(population, row, col)
+	# implementing the probability of flip extension
+	p = np.exp(-(agreement) / alpha)
+	# gives random chance of flipping based on probability
+	critical_value = np.random.random()
+	# flips current element if either given condition is met
+	if critical_value < p or agreement < 0:
+		population[row, col] *= -1
 
-    n_rows, n_cols = population.shape
-    # choose random element in array to simulate
-    row = np.random.randint(0, n_rows)
-    col = np.random.randint(0, n_cols)
-    # calls function to attain agreement value of the current array element
-    agreement = calculate_agreement(population, row, col)
-    # implementing the probability of flip extension
-    p = np.exp(-(agreement) / alpha)
-    # gives random chance of flipping based on probability
-    critical_value = np.random.random()
-    # flips current element if either given condition is met
-    if critical_value < p or agreement < 0:
-        population[row, col] *= -1
-
-    return population
+	return population
 
 
 def plot_ising(im, population):
 	'''
 	This function will display a plot of the Ising model
 	'''
-
 	new_im = np.array([[255 if val == -1 else 1 for val in rows] for rows in population], dtype=np.int8)
 	im.set_data(new_im)
 	plt.pause(0.1)
 
+
 def test_ising():
-    '''
-    This function will test the calculate_agreement function in the Ising model
-    '''
+	'''
+	This function will test the calculate_agreement function in the Ising model
+	'''
 
-    print("Testing ising model calculations")
-    population = -np.ones((3, 3))
-    assert (calculate_agreement(population, 1, 1) == 4), "Test 1"
+	print("Testing ising model calculations")
+	population = -np.ones((3, 3))
+	assert (calculate_agreement(population, 1, 1) == 4), "Test 1"
 
-    population[1, 1] = 1.
-    assert (calculate_agreement(population, 1, 1) == -4), "Test 2"
+	population[1, 1] = 1.
+	assert (calculate_agreement(population, 1, 1) == -4), "Test 2"
 
-    population[0, 1] = 1.
-    assert (calculate_agreement(population, 1, 1) == -2), "Test 3"
+	population[0, 1] = 1.
+	assert (calculate_agreement(population, 1, 1) == -2), "Test 3"
 
-    population[1, 0] = 1.
-    assert (calculate_agreement(population, 1, 1) == 0), "Test 4"
+	population[1, 0] = 1.
+	assert (calculate_agreement(population, 1, 1) == 0), "Test 4"
 
-    population[2, 1] = 1.
-    assert (calculate_agreement(population, 1, 1) == 2), "Test 5"
+	population[2, 1] = 1.
+	assert (calculate_agreement(population, 1, 1) == 2), "Test 5"
 
-    population[1, 2] = 1.
-    assert (calculate_agreement(population, 1, 1) == 4), "Test 6"
+	population[1, 2] = 1.
+	assert (calculate_agreement(population, 1, 1) == 4), "Test 6"
 
-    "Testing external pull"
-    population = -np.ones((3, 3))
-    assert (calculate_agreement(population, 1, 1, 1) == 3), "Test 7"
-    assert (calculate_agreement(population, 1, 1, -1) == 5), "Test 8"
-    assert (calculate_agreement(population, 1, 1, 10) == -6), "Test 9"
-    assert (calculate_agreement(population, 1, 1, -10) == 14), "Test 10"
+	"Testing external pull"
+	population = -np.ones((3, 3))
+	assert (calculate_agreement(population, 1, 1, 1) == 3), "Test 7"
+	assert (calculate_agreement(population, 1, 1, -1) == 5), "Test 8"
+	assert (calculate_agreement(population, 1, 1, 10) == -6), "Test 9"
+	assert (calculate_agreement(population, 1, 1, -10) == 14), "Test 10"
 
-    print("Tests passed")
+	print("Tests passed")
+
 
 def ising_main(population, alpha, external):
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.set_axis_off()
+	fig = plt.figure()
+	ax = fig.add_subplot(111)
+	ax.set_axis_off()
 
-    # Iterating an update 100 times
-    for frame in range(100):
-        # Iterating single steps 1000 times to form an update
-        for step in range(1000):
-            ising_step(population, alpha, external)
-        print('Step:', frame, end='\r')
-        im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
+	# Iterating an update 100 times
+	for frame in range(100):
+		# Iterating single steps 1000 times to form an update
+		for step in range(1000):
+			ising_step(population, alpha, external)
+		print('Step:', frame, end='\r')
+		im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
 
-        plot_ising(im, population)
+		plot_ising(im, population)
+
 
 '''
 ==============================================================================================================
 This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
+
+
 def update_opinions(opinions,T,b):
 	"""
 	updates a list of opinions, returns the updated list
@@ -460,6 +462,7 @@ def update_opinions(opinions,T,b):
 			# updates both opinions
 	return updated_opinions
 
+
 def update_opinion_network(opinion_nodes,T,b):
 	'''
 	Args:
@@ -485,6 +488,7 @@ def update_opinion_network(opinion_nodes,T,b):
 			updated_opinion_nodes[person2_index].value = changed_opinion(opinion2,opinion1,b)
 			# updates both opinions
 	return updated_opinion_nodes
+
 
 def changed_opinion(opinionA, opinionB, b):
 	'''
@@ -525,7 +529,6 @@ def defuant_main_network(b, T, network=None):
 		network.plot(ax)  # plots the current network at that timestep
 		plt.pause(0.03)  # displays the plot for 0.03 seconds
 
-
 	plt.show()  # calling show here prevents the plot from immediately going after the last timestep
 	plt.title("Mean, max and min opinion over timesteps")
 	plt.ylabel("Opinion")
@@ -543,6 +546,7 @@ def defuant_main_network(b, T, network=None):
 	plt.grid()
 	plt.plot([t for t in range(len(opinion_range))], opinion_range)
 	plt.show()
+
 
 def defuant_main(b, T):
 	'''
