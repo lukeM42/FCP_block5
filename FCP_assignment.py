@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -423,8 +425,8 @@ def update_opinions(opinions,T,b):
 	"""
 	updated_opinions = opinions
 	# creates a separate array to add the new opinions onto
-	for person1 in range(len(opinions)):
-		# iterates through all the opinions
+	for i in range(len(opinions)): #reperates for the length of how many opinions there are
+		person1 = random.randint(0,len(opinions)) # picks a random person
 		if np.random.rand() > 0.5:
 			# uses a 50/50 chance to pick which neighbour is used
 			if person1 == len(opinions)-1:
@@ -456,17 +458,20 @@ def update_opinion_network(opinion_nodes,T,b):
 	'''
 	updated_opinion_nodes = opinion_nodes
 	# creates a separate array to add the new opinions onto
-	for person1_index in range(len(opinion_nodes)):
-		connected_indexes = opinion_nodes[person1_index].get_neighbour_indexes()
-		for person2_index in connected_indexes:
-			opinion1 = opinion_nodes[person1_index].value
-			opinion2 = opinion_nodes[person2_index].value
 
-			if ((opinion1 - opinion2)**2)**0.5 < T:
-				# takes the magnitude of the difference of opinion and checks if its lower then the threshold
-				updated_opinion_nodes[person1_index].value = changed_opinion(opinion1,opinion2,b)
-				updated_opinion_nodes[person2_index].value = changed_opinion(opinion2,opinion1,b)
-				# updates both opinions
+	for i in range(len(opinion_nodes)): # iterates for the amount of people there are
+		person1_index = np.random.randint(0,len(opinion_nodes))  # picks a random one
+		connected_indexes = opinion_nodes[person1_index].get_neighbour_indexes()
+
+		person2_index = np.random.randint(0,len(connected_indexes))  #picks a random one of their neighbours
+		opinion1 = opinion_nodes[person1_index].value
+		opinion2 = opinion_nodes[person2_index].value
+
+		if ((opinion1 - opinion2)**2)**0.5 < T:
+			# takes the magnitude of the difference of opinion and checks if its lower then the threshold
+			updated_opinion_nodes[person1_index].value = changed_opinion(opinion1,opinion2,b)
+			updated_opinion_nodes[person2_index].value = changed_opinion(opinion2,opinion1,b)
+			# updates both opinions
 	return updated_opinion_nodes
 
 def changed_opinion(opinionA, opinionB, b):
@@ -490,27 +495,37 @@ def defuant_main_network(b, T, network=None):
 
 	opinions = [node.value for node in network.nodes] # to track the values of the nodes across that timestep
 	mean = [np.mean(opinions)]
+	opinion_max = [max(opinions)]
+	opinions_min = [min(opinions)]
 	opinion_range = [max(opinions) - min(opinions)]
 	fig = plt.figure()
 	ax = fig.add_subplot(111) # declares the animation plot outside the for loop so it redraws on same plot
+
 	for t in range(1, 101):  # iterates through the 100 time steps
 		network.nodes = update_opinion_network(network.nodes, T, b) # updates the opinions
 		opinions = [node.value for node in network.nodes]
 		mean.append(np.mean(opinions))
 		opinion_range.append(max(opinions) - min(opinions))
+		opinion_max.append(max(opinions))
+		opinions_min.append(min(opinions))
 		ax.cla() # clears the previous plot to re-draw the new one
 		ax.set_axis_off()
 		network.plot(ax) # plots the current network at that timestep
 		plt.pause(0.03) # displays the plot for 0.03 seconds
-	plt.show() # calling show here prevents the plot from immediately going after the last timestep
-	plt.title("Mean over timesteps")
-	plt.ylabel("Opinion mean")
+
+
+	plt.show()  # calling show here prevents the plot from immediately going after the last timestep
+	plt.title("Mean, max and min opinion over timesteps")
+	plt.ylabel("Opinion")
 	plt.xlabel("Timestep")
 	plt.grid()
 	plt.plot([t for t in range(len(mean))], mean)
+	plt.plot([t for t in range(len(opinion_max))], opinion_max)
+	plt.plot([t for t in range(len(opinions_min))], opinions_min)
+	plt.legend(["Mean", "Max", "Min"])
 	plt.show()
 
-	plt.title("Range of opinions over timesteps")
+	plt.title("Range max and min of opinions over timesteps")
 	plt.ylabel("Opinion range")
 	plt.xlabel("Timestep")
 	plt.grid()
