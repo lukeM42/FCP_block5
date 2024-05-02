@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -33,9 +31,9 @@ class Queue:
 		self.queue.append(item)
 
 	def pop(self):
-		if len(self.queue) < 1:
+		if len(self.queue) < 1:  # checks if the queue is empty
 			return None
-		return self.queue.pop(0)
+		return self.queue.pop(0)  # otherwise pops the first element
 
 	def is_empty(self):
 		return len(self.queue) == 0
@@ -131,9 +129,8 @@ class Network:
 	def make_ring_network(self, N, neighbour_range=1):
 		'''
 		creates a ring network with the amount of nodes N and range 1
-		:param N:
-		:param neighbour_range:
-		:return:
+		:param N: Size of network
+		:param neighbour_range: How many neighbours on either side it should connect to
 		'''
 		self.nodes = []
 		for index in range(N):
@@ -147,10 +144,16 @@ class Network:
 			self.nodes.append(Node(np.random.random(), index, connections))
 
 	def make_small_world_network(self, N, re_wire_prob=0.2):
+		'''
+		Makes a small world network
+		Args:
+			N: Size of the small world network
+			re_wire_prob: chance that a connection is disconnected and reconnected somewhere else
+		'''
 		self.nodes = []
 		for node_number in range(N):
-			value = np.random.random()
-			connections = [0 for _ in range(N)]
+			value = np.random.random()  # generates a random value for the node
+			connections = [0 for _ in range(N)]  # creates an array of 0's of size N
 			self.nodes.append(Node(value, node_number, connections))
 
 		for (index, node) in enumerate(self.nodes):
@@ -160,11 +163,11 @@ class Network:
 						random_index = int(np.random.random() * N)
 						while random_index == index and N > 1:  # N>1 needed to prevent while true loop
 							# Generates a random index until the random index isn't the index of the node itself
-							random_index = int(np.random.random() * N)
-						node.connections[random_index] = 1
-						self.nodes[random_index].connections[index] = 1
+							random_index = np.random.randint(0, N)  # generates a random number within
+						node.connections[random_index] = 1  # connects the node with the node at that random index
+						self.nodes[random_index].connections[index] = 1  # connects the random index node back to that node
 					else:
-						if neighbour_index < N:
+						if neighbour_index < N:  # if it doesn't meet the rewire probability, wire it as usual
 							node.connections[neighbour_index] = 1
 							self.nodes[neighbour_index].connections[index] = 1
 						else:
@@ -172,8 +175,11 @@ class Network:
 							self.nodes[neighbour_index - N].connections[index] = 1
 
 	def plot(self,ax):
-
-
+		"""
+		Args:
+			ax: The axis to use, this allows for it to be an animation
+		Returns: A display of the nodes on a graph
+		"""
 		num_nodes = len(self.nodes)
 		network_radius = num_nodes * 10
 		ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
@@ -433,7 +439,7 @@ def update_opinions(opinions,T,b):
 	updated_opinions = opinions
 	# creates a separate array to add the new opinions onto
 	for i in range(len(opinions)): #reperates for the length of how many opinions there are
-		person1 = random.randint(0,len(opinions)) # picks a random person
+		person1 = np.random.randint(0,len(opinions))  # picks a random person
 		if np.random.rand() > 0.5:
 			# uses a 50/50 chance to pick which neighbour is used
 			if person1 == len(opinions)-1:
@@ -469,9 +475,8 @@ def update_opinion_network(opinion_nodes,T,b):
 	for i in range(len(opinion_nodes)): # iterates for the amount of people there are
 		person1_index = np.random.randint(0,len(opinion_nodes))  # picks a random one
 		connected_indexes = opinion_nodes[person1_index].get_neighbour_indexes()
-
-		person2_index = np.random.randint(0,len(connected_indexes))  #picks a random one of their neighbours
-		opinion1 = opinion_nodes[person1_index].value
+		person2_index = np.random.randint(0,len(connected_indexes))  # picks a random one of their neighbours
+		opinion1 = opinion_nodes[person1_index].value  # gets both of their opinions
 		opinion2 = opinion_nodes[person2_index].value
 
 		if ((opinion1 - opinion2)**2)**0.5 < T:
@@ -501,7 +506,7 @@ def defuant_main_network(b, T, network=None):
 	'''
 
 	opinions = [node.value for node in network.nodes] # to track the values of the nodes across that timestep
-	mean = [np.mean(opinions)]
+	mean = [np.mean(opinions)]  # defines variables for the mean and range plots
 	opinion_max = [max(opinions)]
 	opinions_min = [min(opinions)]
 	opinion_range = [max(opinions) - min(opinions)]
@@ -515,10 +520,10 @@ def defuant_main_network(b, T, network=None):
 		opinion_range.append(max(opinions) - min(opinions))
 		opinion_max.append(max(opinions))
 		opinions_min.append(min(opinions))
-		ax.cla() # clears the previous plot to re-draw the new one
+		ax.cla()  # clears the previous plot to re-draw the new one
 		ax.set_axis_off()
-		network.plot(ax) # plots the current network at that timestep
-		plt.pause(0.03) # displays the plot for 0.03 seconds
+		network.plot(ax)  # plots the current network at that timestep
+		plt.pause(0.03)  # displays the plot for 0.03 seconds
 
 
 	plt.show()  # calling show here prevents the plot from immediately going after the last timestep
@@ -527,7 +532,7 @@ def defuant_main_network(b, T, network=None):
 	plt.xlabel("Timestep")
 	plt.grid()
 	plt.plot([t for t in range(len(mean))], mean)
-	plt.plot([t for t in range(len(opinion_max))], opinion_max)
+	plt.plot([t for t in range(len(opinion_max))], opinion_max)  # additional plots for the max and min
 	plt.plot([t for t in range(len(opinions_min))], opinions_min)
 	plt.legend(["Mean", "Max", "Min"])
 	plt.show()
@@ -555,7 +560,8 @@ def defuant_main(b, T):
 	for t in range(1, 101):  # iterates through the 100 time steps
 		opinions = update_opinions(opinions, T, b)  # calls function to update all the opinions each time
 		graph2.scatter([t for i in range(len(opinions))], opinions, c='red')  # plots the set of opinions for that time step
-	graph1.hist(opinions, bins=[i / 10 for i in range(11)])  #creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
+	graph1.hist(opinions, bins=[i / 10 for i in range(11)])
+	# creates the histogram with 11 bins going from 0 to 1 in increments of 0.1
 	plt.ylabel('Opinions')
 	plt.ylim([0, 1])
 	plt.show()
@@ -566,8 +572,8 @@ def test_defuant():
 	Tests the Defaunt model functions
 	"""
 	print("Testing Defuant model")
-	opinions = [0.1,0.9]
-	updated = [0.1,0.9]
+	opinions = [0.1, 0.9]
+	updated = [0.1, 0.9]
 	# tests threshold check
 	assert (update_opinions(opinions, 0.5, 0.2) == updated), "Test 1"
 	# tests if the opinions are changed correctly
@@ -615,7 +621,7 @@ def main():
 
 	# Ising model flag handling
 	if args.ising_model:
-		if type(args.alpha) == list:
+		if type(args.alpha) == list:  # takes any passed in flag values out of the list they come in
 			args.alpha = args.alpha[0]
 		if type(args.external) == list:
 			args.external = args.external[0]
